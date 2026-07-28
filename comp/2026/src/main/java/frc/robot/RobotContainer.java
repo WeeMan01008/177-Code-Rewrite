@@ -4,15 +4,20 @@
 
 package frc.robot;
 
+import frc.robot.commands.DriveCommands;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.carwash.Carwash;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.hood.Hood;
-import frc.robot.subsystems.hotdog.Hotdog;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.shooter.ShooterState;
+import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.hood.HoodState;
+import frc.robot.subsystems.hotdog.HotdogState;
+import frc.robot.subsystems.intake.IntakeState;
 import frc.robot.subsystems.shooter.ShooterState;
 import frc.robot.subsystems.vision.Vision;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -27,18 +32,50 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ShooterState shooter = new ShooterState();
   private final Carwash carwash = new Carwash();
-  private final Hood hood = new Hood();
-  private final Intake intake = new Intake();
-  private final Hotdog hotdog = new Hotdog();
-  private final Vision vision = new Vision(null);
-  private final Drive drive = new Drive(null, null, null, null, null);
+  private final HoodState hood = new HoodState();
+  private final IntakeState intake = new IntakeState();
+  private final HotdogState hotdog = new HotdogState();
+  public final Vision vision = new Vision(null);
+  public final Drive drive;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final XboxController driverController = new XboxController(0);
-  private final XboxController operatorController = new XboxController(1);
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandXboxController operatorController = new CommandXboxController(1);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    switch (Constants.currentMode){
+
+      case REAL:
+        drive = new Drive(new GyroIOPigeon2(),
+            new ModuleIOTalonFX(TunerConstants.FrontLeft),
+            new ModuleIOTalonFX(TunerConstants.FrontRight),
+            new ModuleIOTalonFX(TunerConstants.BackLeft),
+            new ModuleIOTalonFX(TunerConstants.BackRight));
+
+      break;
+
+      case SIM:
+        drive = new Drive(new GyroIO() {
+            }, new ModuleIOSim(TunerConstants.FrontLeft),
+              new ModuleIOSim(TunerConstants.FrontRight),
+              new ModuleIOSim(TunerConstants.BackLeft),
+              new ModuleIOSim(TunerConstants.BackRight));
+
+      break;
+
+      default:
+        drive = new Drive(new GyroIO() {
+          }, new ModuleIO() {
+          }, new ModuleIO() {
+          }, new ModuleIO() {
+          },
+          new ModuleIO() {
+          });
+
+      break;
+    }
     // Configure the trigger bindings
     configureBindings();
   }
@@ -57,6 +94,13 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
+
+    drive.setDefaultCommand(
+                DriveCommands.joystickDrive(
+                        drive,
+                        () -> -driverController.getLeftY(),
+                        () -> -driverController.getLeftX(),
+                        () -> -driverController.getRightX()));
   }
 
   /**

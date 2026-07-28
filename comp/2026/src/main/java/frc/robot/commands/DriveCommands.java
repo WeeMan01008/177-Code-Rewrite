@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.bobcatrobotics.Subsystems.AntiTippingLib.AntiTipping;
+
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
   private static final double ANGLE_KP = 5.0;
@@ -129,39 +131,39 @@ public class DriveCommands {
 
 
 
-  // /**
-  //  * Field relative drive command using two joysticks (controlling linear and angular velocities).
-  //  * Uses the AntiTipping Lib!
-  //  */
-  // public static Command joystickDriveWithAntiTipping(Drive drive, DoubleSupplier xSupplier,
-  //     DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, AntiTipping antiTpping) {
-  //   return Commands.run(() -> {
-  //     ChassisSpeeds speeds;
-  //     if (antiTpping.isTipping()) {
-  //       speeds = antiTpping.getVelocityAntiTipping();
-  //     } else {
-  //       // Get linear velocity
-  //       Translation2d linearVelocity =
-  //           getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+  /**
+   * Field relative drive command using two joysticks (controlling linear and angular velocities).
+   * Uses the AntiTipping Lib!
+   */
+  public static Command joystickDriveWithAntiTipping(Drive drive, DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, AntiTipping antiTpping) {
+    return Commands.run(() -> {
+      ChassisSpeeds speeds;
+      if (antiTpping.isTipping()) {
+        speeds = antiTpping.getVelocityAntiTipping();
+      } else {
+        // Get linear velocity
+        Translation2d linearVelocity =
+            getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-  //       // Apply rotation deadband
-  //       double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+        // Apply rotation deadband
+        double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
-  //       // Square rotation value for more precise control
-  //       omega = Math.copySign(omega * omega, omega);
+        // Square rotation value for more precise control
+        omega = Math.copySign(omega * omega, omega);
 
-  //       // Convert to field relative speeds & send command
-  //       speeds = new ChassisSpeeds(linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-  //           linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-  //           omega * drive.getMaxAngularSpeedRadPerSec());
-  //     }
-  //     boolean isFlipped = DriverStation.getAlliance().isPresent()
-  //         && DriverStation.getAlliance().get() == Alliance.Red;
-  //     drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
-  //         isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));
+        // Convert to field relative speeds & send command
+        speeds = new ChassisSpeeds(linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+            linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+            omega * drive.getMaxAngularSpeedRadPerSec());
+      }
+      boolean isFlipped = DriverStation.getAlliance().isPresent()
+          && DriverStation.getAlliance().get() == Alliance.Red;
+      drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
+          isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));
 
-  //   }, drive);
-  // }
+    }, drive);
+  }
 
   /**
    * Measures the velocity feedforward constants for the drive motors.

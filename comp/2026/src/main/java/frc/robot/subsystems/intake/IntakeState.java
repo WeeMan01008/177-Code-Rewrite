@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.intakeConstants;
@@ -22,8 +23,9 @@ public class IntakeState extends SubsystemBase{
     final VelocityVoltage intakeRollerPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
     final VelocityVoltage intakeDeployPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
     private double velocity;
+    private double angle;
 
-public enum ShooterStates {
+public enum IntakeStates {
     idle, 
     intakeDeployed,
     IntakeStored,
@@ -63,16 +65,32 @@ public void configureIntakeRollers(){
     leftIntakeRoller.setControl(new Follower(intakeConstants.INTAKE_ROLLERRIGHT_MOTOR_ID, MotorAlignmentValue.Opposed));
 }
 
-public void setIntakeDeployVelocity(double velocity) {
-    intakeDeploy.setControl(intakeDeployPIDRequest.withVelocity(velocity));
+public void setIntakeDeployedAngle(double angle) {
+    intakeDeploy.setPosition(angle);
 }
 
-public void setRightIntakeRollerVelocity(double velocity) {
+public void setIntakeDeployedStop(){
+    intakeDeploy.stopMotor();
+}
+
+public void setIntakeStoredAngle(double angle) {
+    intakeDeploy.setPosition(angle);
+}
+
+public void setLeftIntakeRollerVelocity(double velocity) {
     leftIntakeRoller.setControl(intakeRollerPIDRequest.withVelocity(velocity));
 }
 
-public StatusSignal<AngularVelocity> getIntakeDeployVelocity(){
-    return intakeDeploy.getVelocity();
+public void setLeftIntakeRollerOuttakeVelocity(double velocity) {
+    leftIntakeRoller.setControl(intakeRollerPIDRequest.withVelocity(-velocity));
+}
+
+public void setLeftIntakeRollerStop(){
+    leftIntakeRoller.stopMotor();
+}
+
+public StatusSignal<Angle> getIntakePosition(){
+    return intakeDeploy.getPosition();
 }
 
 public StatusSignal<AngularVelocity> getRightIntakeVelocity(){
@@ -83,30 +101,34 @@ public StatusSignal<AngularVelocity> getLeftIntakeVelocity(){
     return leftIntakeRoller.getVelocity();
 }
 
-public ShooterStates CurrentState = ShooterStates.idle;
+public IntakeStates CurrentState = IntakeStates.idle;
 
 @Override
 public void periodic(){
     switch (CurrentState) {
         case idle:
-        intakeDeploy.stopMotor();
-        leftIntakeRoller.stopMotor();
+            this.setIntakeDeployedStop();
+            this.setLeftIntakeRollerStop();
             
         break;
 
         case intakeDeployed:
+            this.setIntakeDeployedAngle(angle);
 
         break;
 
         case IntakeStored:
+            this.setIntakeStoredAngle(angle);
 
         break;
 
         case intake:
+            this.setLeftIntakeRollerVelocity(velocity);
 
         break;
 
         case outtake:
+            this.setLeftIntakeRollerVelocity(velocity);
     }
 }
 }

@@ -6,7 +6,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.Idle;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -58,6 +57,14 @@ public void setTopRightShooterVelocity(double velocity) {
     topRightShooter.setControl(shooterMotorPIDRequest.withVelocity(velocity));
 }
 
+public void setTopRightShooterUnjamVelocity(double velocity) {
+    topRightShooter.setControl(shooterMotorPIDRequest.withVelocity(-velocity));
+}
+
+public void stopStopRightShooter(){
+    topRightShooter.stopMotor();
+}
+
 public StatusSignal<AngularVelocity> getTopRightShooterVelocity(){
     return topLeftShooter.getVelocity();
 }
@@ -95,7 +102,7 @@ public void periodic(){
         break;
 
         case reverse:
-            this.setTopRightShooterVelocity(-velocity);
+            this.setTopRightShooterUnjamVelocity(velocity);
     }
 }
 }

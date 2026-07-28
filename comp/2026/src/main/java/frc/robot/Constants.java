@@ -33,6 +33,9 @@ public final class Constants {
   //Constant for hood motor ID
     public static final int HOOD_MOTOR_ID = 0;
 
+    public static final double[] HOOD_POSITION_SHOOTING = {};
+    public static final double[] HOOD_POSITION_PASSING = {};
+
   }
 
   public static class shooterConstants{
@@ -62,6 +65,12 @@ public final class Constants {
     public static final int INTAKE_ROLLERRIGHT_MOTOR_ID = 0;
 
     public static final int STATOR_CURRENT_LIMIT = 70;
+
+    public static final double INTAKE_VELOCITY = 0;
+    public static final double OUTTAKE_VELOCITY = 0;
+
+    public static final double INTAKE_DEPLOYED_POSITION = 0;
+    public static final double INTAKE_STORED_POSITION = 0;
 
   }
 
