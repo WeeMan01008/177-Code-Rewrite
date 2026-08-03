@@ -12,21 +12,31 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.hotdogConstants;
 import frc.robot.Constants.intakeConstants;
+import frc.robot.subsystems.intake.IntakeState.IntakeStates;
 
-public class HotdogState extends SubsystemBase{
-    public TalonFX hotdog;
+//TODO: fix tabbing/spacing
+    public class HotdogState extends SubsystemBase{
+        private TalonFX hotdog;
 
-    final VelocityVoltage HotdogPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
-    private double velocity;
+        public HotdogState() {
+            configureHotdog();
+        }
 
-public enum HotdogStates {
-    idle, 
-    //forward is toward carwash and reverse is toward intake
-    forward,
-    reverse,
+        private final VelocityVoltage HotdogPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
+        private double velocity;
+
+    public enum HotdogStates {
+        Idle, 
+        //forward is toward carwash and reverse is toward intake
+        Forward,
+        Reverse,
 }
 
-public void configureIntakeDeploy(){
+// TODO:  shouldn't expose public fields
+private HotdogStates CurrentState = HotdogStates.Idle;
+
+//TODO:  what executes this?
+public void configureHotdog(){
     hotdog = new TalonFX(hotdogConstants.HOTDOG_MOTOR_ID, new CANBus("rio"));
     var hotdogConfigure = new TalonFXConfiguration();
     hotdogConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
@@ -57,22 +67,25 @@ public StatusSignal<AngularVelocity> getHotdogVelocity(){
     return hotdog.getVelocity();
 }
 
-public HotdogStates CurrentState = HotdogStates.idle;
+public void setCurrentState(HotdogStates state){
+    CurrentState = state;
+}
 
 @Override
 public void periodic(){
     switch (CurrentState) {
-        case idle:
+        case Idle:
             this.setHotdogStop();
             
         break;
 
-        case forward:
+        case Forward:
+            //TODO:  nothing is setting velocity
             this.setHotdogVelocity(velocity);
 
         break;
 
-        case reverse:
+        case Reverse:
             this.setHotdogReverseVelocity(velocity);
 
         break;

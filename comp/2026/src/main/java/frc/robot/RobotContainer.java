@@ -7,6 +7,8 @@ package frc.robot;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.carwash.Carwash;
+import frc.robot.subsystems.carwash.CarwashState;
+import frc.robot.subsystems.carwash.CarwashState.CarwashStates;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -16,9 +18,13 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.hood.HoodState;
 import frc.robot.subsystems.hotdog.HotdogState;
 import frc.robot.subsystems.intake.IntakeState;
+import frc.robot.subsystems.intake.IntakeState.IntakeStates;
 import frc.robot.subsystems.shooter.ShooterState;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionConstants;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -31,11 +37,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ShooterState shooter = new ShooterState();
-  private final Carwash carwash = new Carwash();
+  private final CarwashState carwash = new CarwashState();
   private final HoodState hood = new HoodState();
   private final IntakeState intake = new IntakeState();
   private final HotdogState hotdog = new HotdogState();
-  public final Vision vision = new Vision(null);
+  //private final RobotState robotState = new RobotState();
+  public final Vision vision;
   public final Drive drive;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -54,6 +61,13 @@ public class RobotContainer {
             new ModuleIOTalonFX(TunerConstants.BackLeft),
             new ModuleIOTalonFX(TunerConstants.BackRight));
 
+        vision =
+                new Vision(
+                  drive::addVisionMeasurement,
+                  new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera2Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera3Name, drive::getRotation));
       break;
 
       case SIM:
@@ -63,6 +77,13 @@ public class RobotContainer {
               new ModuleIOSim(TunerConstants.BackLeft),
               new ModuleIOSim(TunerConstants.BackRight));
 
+        vision =
+                new Vision(
+                  drive::addVisionMeasurement,
+                  new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera2Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera3Name, drive::getRotation));
       break;
 
       default:
@@ -74,6 +95,13 @@ public class RobotContainer {
           new ModuleIO() {
           });
 
+        vision =
+                new Vision(
+                  drive::addVisionMeasurement,
+                  new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera2Name, drive::getRotation),
+                  new VisionIOLimelight(VisionConstants.camera3Name, drive::getRotation));
       break;
     }
     // Configure the trigger bindings
@@ -101,6 +129,20 @@ public class RobotContainer {
                         () -> -driverController.getLeftY(),
                         () -> -driverController.getLeftX(),
                         () -> -driverController.getRightX()));
+
+    driverController.a()
+    .whileTrue(Commands.runOnce(() -> carwash.setCurrentState(CarwashStates.Foward),carwash))
+    .onFalse(Commands.runOnce(() -> carwash.setCurrentState(CarwashStates.Idle), carwash));
+
+    driverController.b()
+    .whileTrue(Commands.runOnce(() -> intake.setCurrentState(IntakeStates.IntakeDeployed),intake))
+    .onFalse(Commands.runOnce(() -> intake.setCurrentState(IntakeStates.Idle), intake));
+
+    driverController.y()
+    .whileTrue(Commands.runOnce(() -> intake.setCurrentState(IntakeStates.IntakeStored),intake))
+    .onFalse(Commands.runOnce(() -> intake.setCurrentState(IntakeStates.Idle), intake));
+
+    //driverController.b().onTrue(Commands.runOnce(()-> intake.setCurrentState(IntakeStates.IntakeDeployed)));
   }
 
   /**

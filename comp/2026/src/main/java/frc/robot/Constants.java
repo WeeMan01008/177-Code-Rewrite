@@ -31,7 +31,7 @@ public final class Constants {
 
   public static class hoodConstants{
   //Constant for hood motor ID
-    public static final int HOOD_MOTOR_ID = 0;
+    public static final int HOOD_MOTOR_ID = 21;
 
     public static final double[] HOOD_POSITION_SHOOTING = {};
     public static final double[] HOOD_POSITION_PASSING = {};
@@ -40,11 +40,11 @@ public final class Constants {
 
   public static class shooterConstants{
   //Constants for drum shooter motor ID's, listed by view from behind robot
-    public static final int TOPLEFT_SHOOTER_MOTOR_ID = 0;
-    public static final int BOTTOMLEFT_SHOOTER_MOTOR_ID = 0;
+    public static final int TOPLEFT_SHOOTER_MOTOR_ID = 13;
+    public static final int BOTTOMLEFT_SHOOTER_MOTOR_ID = 20;
 
-    public static final int TOPRIGHT_SHOOTER_MOTOR_ID = 0;
-    public static final int BOTTOMRIGHT_SHOOTER_MOTOR_ID = 0;
+    public static final int TOPRIGHT_SHOOTER_MOTOR_ID = 11;
+    public static final int BOTTOMRIGHT_SHOOTER_MOTOR_ID = 14;
 
     public static final int STATOR_CURRENT_LIMIT = 70;
 
@@ -60,48 +60,30 @@ public final class Constants {
 
   public static class intakeConstants{
   //Constants for intake motor ID's
-    public static final int INTAKE_DEPLOY_MOTOR_ID = 0;
-    public static final int INTAKE_ROLLERLEFT_MOTOR_ID = 0;
-    public static final int INTAKE_ROLLERRIGHT_MOTOR_ID = 0;
+    public static final int INTAKE_DEPLOY_MOTOR_ID = 10;
+    public static final int INTAKE_ROLLERLEFT_MOTOR_ID = 18;
+    public static final int INTAKE_ROLLERRIGHT_MOTOR_ID = 19;
 
     public static final int STATOR_CURRENT_LIMIT = 70;
 
     public static final double INTAKE_VELOCITY = 0;
     public static final double OUTTAKE_VELOCITY = 0;
 
-    public static final double INTAKE_DEPLOYED_POSITION = 0;
-    public static final double INTAKE_STORED_POSITION = 0;
+    public static final double INTAKE_DEPLOYED_POSITION = 11.522;
+    public static final double INTAKE_STORED_POSITION = -0.155;
 
   }
 
   public static class hotdogConstants{
   //Constant for hotdog motor ID
-    public static final int HOTDOG_MOTOR_ID = 0;
+    public static final int HOTDOG_MOTOR_ID = 16;
 
   }
 
   public static class carwashConstants{
   //Constants for carwash motor ID's
-    public static final int CARWASH_WASHER_MOTOR_ID = 0;
+    public static final int CARWASH_WASHER_MOTOR_ID = 15;
+
+    public static final double CARWASH_SPIN_VELOCITY = 25;
   }
-  
-  public static class driveConstants{
-  //Constants for drive train motor and encoder ID's
-    public static final int FRONTLEFT_DRIVE_ID = 0;
-    public static final int FRONTLEFT_ANGLE_ID = 0;
-    public static final int FRONTLEFT_ENCODER_ID = 0;
-
-    public static final int FRONTRIGHT_DRIVE_ID = 0;
-    public static final int FRONTRIGHT_ANGLE_ID = 0;
-    public static final int FRONTRIGHT_ENCODER_ID = 0;
-
-    public static final int BACKLEFT_DRIVE_ID = 0;
-    public static final int BACKLEFT_ANGLE_ID = 0;
-    public static final int BACKLEFT_ENCODER_ID = 0;
-
-    public static final int BACKRIGHT_DRIVE_ID = 0;
-    public static final int BACKRIGHT_ANGLE_ID = 0;
-    public static final int BACKRIGHT_ENCODER_ID = 0;
-  }
-
 }

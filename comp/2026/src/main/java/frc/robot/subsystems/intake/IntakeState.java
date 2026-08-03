@@ -4,6 +4,7 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -14,24 +15,36 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.intakeConstants;
+import frc.robot.subsystems.shooter.ShooterState.ShooterStates;
 
-public class IntakeState extends SubsystemBase{
-    public TalonFX intakeDeploy;
-    public TalonFX rightIntakeRoller;
-    public TalonFX leftIntakeRoller;
+//TODO: fix tabbing/spacing
+    public class IntakeState extends SubsystemBase{
+    //TOOD: why public?
+        private TalonFX intakeDeploy;
+        private TalonFX rightIntakeRoller;
+        private TalonFX leftIntakeRoller;
 
-    final VelocityVoltage intakeRollerPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
-    final VelocityVoltage intakeDeployPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
-    private double velocity;
-    private double angle;
+        public IntakeState() {
+            configureIntakeDeploy();
+            configureIntakeRollers();
+        }   
 
-public enum IntakeStates {
-    idle, 
-    intakeDeployed,
-    IntakeStored,
-    intake,
-    outtake
+        // TODO: why no explicit access modifier
+        private final VelocityVoltage intakeRollerPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
+        //TODO:  do you think there is a different control request that would be better for deploy?
+        private final PositionVoltage intakeDeployPositionRequest = new PositionVoltage(0);
+        private double velocity;
+        private double angle;
+
+    public enum IntakeStates {
+        Idle, 
+        IntakeDeployed,
+        IntakeStored,
+        Intake,
+        Outtake
 }
+
+private IntakeStates CurrentState = IntakeStates.Idle;
 
 public void configureIntakeDeploy(){
     intakeDeploy = new TalonFX(intakeConstants.INTAKE_DEPLOY_MOTOR_ID, new CANBus("rio"));
@@ -49,15 +62,16 @@ public void configureIntakeDeploy(){
 }
 
 public void configureIntakeRollers(){
-    rightIntakeRoller = new TalonFX(intakeConstants.INTAKE_ROLLERLEFT_MOTOR_ID, new CANBus("rio"));
+    rightIntakeRoller = new TalonFX(intakeConstants.INTAKE_ROLLERRIGHT_MOTOR_ID, new CANBus("rio"));
+    leftIntakeRoller = new TalonFX(intakeConstants.INTAKE_ROLLERLEFT_MOTOR_ID, new CANBus("rio"));
     var intakeRollersConfigure = new TalonFXConfiguration();
     intakeRollersConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
     intakeRollersConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
     intakeRollersConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     intakeRollersConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     intakeRollersConfigure.Slot0.kS = 0;
-    intakeRollersConfigure.Slot0.kV = 0;
-    intakeRollersConfigure.Slot0.kP = 0;
+    intakeRollersConfigure.Slot0.kV = 0.11;
+    intakeRollersConfigure.Slot0.kP = 1;
     intakeRollersConfigure.Slot0.kI = 0;
     intakeRollersConfigure.Slot0.kD = 0;
     rightIntakeRoller.getConfigurator().apply(intakeRollersConfigure);
@@ -66,27 +80,27 @@ public void configureIntakeRollers(){
 }
 
 public void setIntakeDeployedAngle(double angle) {
-    intakeDeploy.setPosition(angle);
+    intakeDeploy.setControl(intakeDeployPositionRequest.withPosition(angle).withFeedForward(2));
+}
+
+public void setIntakeStoredAngle(double angle) {
+    intakeDeploy.setControl(intakeDeployPositionRequest.withPosition(angle).withFeedForward(-2));
 }
 
 public void setIntakeDeployedStop(){
     intakeDeploy.stopMotor();
 }
 
-public void setIntakeStoredAngle(double angle) {
-    intakeDeploy.setPosition(angle);
+public void setRightIntakeRollerVelocity(double velocity) {
+    rightIntakeRoller.setControl(intakeRollerPIDRequest.withVelocity(velocity));
 }
 
-public void setLeftIntakeRollerVelocity(double velocity) {
-    leftIntakeRoller.setControl(intakeRollerPIDRequest.withVelocity(velocity));
+public void setRightIntakeRollerOuttakeVelocity(double velocity) {
+    rightIntakeRoller.setControl(intakeRollerPIDRequest.withVelocity(-velocity));
 }
 
-public void setLeftIntakeRollerOuttakeVelocity(double velocity) {
-    leftIntakeRoller.setControl(intakeRollerPIDRequest.withVelocity(-velocity));
-}
-
-public void setLeftIntakeRollerStop(){
-    leftIntakeRoller.stopMotor();
+public void setRightIntakeRollerStop(){
+    rightIntakeRoller.stopMotor();
 }
 
 public StatusSignal<Angle> getIntakePosition(){
@@ -101,34 +115,38 @@ public StatusSignal<AngularVelocity> getLeftIntakeVelocity(){
     return leftIntakeRoller.getVelocity();
 }
 
-public IntakeStates CurrentState = IntakeStates.idle;
+public void setCurrentState(IntakeStates state){
+        CurrentState = state;
+}
 
 @Override
 public void periodic(){
     switch (CurrentState) {
-        case idle:
+        case Idle:
             this.setIntakeDeployedStop();
-            this.setLeftIntakeRollerStop();
+            this.setRightIntakeRollerStop();
             
         break;
 
-        case intakeDeployed:
-            this.setIntakeDeployedAngle(angle);
+        case IntakeDeployed:
+            //TODO:  nothing is setting angle
+            this.setIntakeDeployedAngle(intakeConstants.INTAKE_DEPLOYED_POSITION);
 
         break;
 
         case IntakeStored:
-            this.setIntakeStoredAngle(angle);
+            this.setIntakeStoredAngle(intakeConstants.INTAKE_STORED_POSITION);
 
         break;
 
-        case intake:
-            this.setLeftIntakeRollerVelocity(velocity);
+        case Intake:
+            //TODO:  nothing is setting velocity
+            this.setRightIntakeRollerVelocity(velocity);
 
         break;
 
-        case outtake:
-            this.setLeftIntakeRollerVelocity(velocity);
+        case Outtake:
+            this.setRightIntakeRollerVelocity(velocity);
     }
 }
 }

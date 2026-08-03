@@ -12,33 +12,46 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.carwashConstants;
 import frc.robot.Constants.intakeConstants;
+import frc.robot.subsystems.hood.HoodState.HoodStates;
 
+//TODO: fix tabbing/spacing
 public class CarwashState extends SubsystemBase{
-    public TalonFX carwash;
+    //TOOD: why public?
+    private TalonFX carwash;
 
-    final VelocityVoltage carwashPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
+    public CarwashState() {
+        configureCarwash();
+    }
+    
+    // TODO: why no explicit access modifier
+    private final VelocityVoltage carwashPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
     private double velocity;
 
-public enum CarwashStates {
-    idle, 
-    //forward is into shooter and reverse is into hopper
-    foward,
-    reverse,
+    
+    public enum CarwashStates {
+        Idle, 
+        //forward is into shooter and reverse is into hopper
+        Foward,
+        Reverse,
 }
 
-public void configureIntakeDeploy(){
-    carwash = new TalonFX(carwashConstants.CARWASH_WASHER_MOTOR_ID, new CANBus("rio"));
-    var carwashConfigure = new TalonFXConfiguration();
-    carwashConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
-    carwashConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
-    carwashConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    carwashConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    carwashConfigure.Slot0.kS = 0;
-    carwashConfigure.Slot0.kV = 0;
-    carwashConfigure.Slot0.kP = 0;
-    carwashConfigure.Slot0.kI = 0;
-    carwashConfigure.Slot0.kD = 0;
-    carwash.getConfigurator().apply(carwashConfigure);
+// TODO:  shouldn't expose public fields
+private CarwashStates CurrentState = CarwashStates.Idle;
+
+    //TODO:  what executes this?
+    public void configureCarwash(){
+        carwash = new TalonFX(carwashConstants.CARWASH_WASHER_MOTOR_ID, new CANBus("rio"));
+        var carwashConfigure = new TalonFXConfiguration();
+        carwashConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
+        carwashConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
+        carwashConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        carwashConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        carwashConfigure.Slot0.kS = 0;
+        carwashConfigure.Slot0.kV = 0.11;
+        carwashConfigure.Slot0.kP = 1;
+        carwashConfigure.Slot0.kI = 0;
+        carwashConfigure.Slot0.kD = 0;
+        carwash.getConfigurator().apply(carwashConfigure);
 }
 
 public void setCarwashForwardVelocity(double velocity) {
@@ -57,22 +70,25 @@ public StatusSignal<AngularVelocity> getCarwashVelocity(){
     return carwash.getVelocity();
 }
 
-public CarwashStates CurrentState = CarwashStates.idle;
+public void setCurrentState(CarwashStates state){
+    CurrentState = state;
+}
 
 @Override
 public void periodic(){
     switch (CurrentState) {
-        case idle:
+        case Idle:
             this.setCarwashStop();
             
         break;
 
-        case foward:
-            this.setCarwashForwardVelocity(velocity);
+        case Foward:
+            //TODO:  nothing is setting velocity
+            this.setCarwashForwardVelocity(carwashConstants.CARWASH_SPIN_VELOCITY);
 
         break;
 
-        case reverse:
+        case Reverse:
             this.setCarwashReverseVelocity(velocity);
 
         break;

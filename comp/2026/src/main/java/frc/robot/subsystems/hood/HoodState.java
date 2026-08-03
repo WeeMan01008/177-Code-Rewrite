@@ -13,20 +13,34 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.hoodConstants;
 import frc.robot.Constants.intakeConstants;
+import frc.robot.subsystems.hotdog.HotdogState.HotdogStates;
 
+//TODO: fix tabbing/spacing
 public class HoodState extends SubsystemBase{
-    public TalonFX hood;
+    //TOOD: why public?
+    private TalonFX hood;
 
-    final VelocityVoltage HoodPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
+    public HoodState() {
+        configureHood();
+    }
+
+    // TODO: why no explicit access modifier
+    private final VelocityVoltage HoodPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
     private double velocity;
 
-public enum HoodStates {
-    idle, 
-    up,
-    down,
+    public enum HoodStates {
+        Idle, 
+        Up,
+        Down,
+        PositionShoot,
+        PositionPass
 }
 
-public void configureIntakeDeploy(){
+// TODO:  shouldn't expose public fields
+private HoodStates CurrentState = HoodStates.Idle;
+
+//TODO:  what executes this?
+public void configureHood(){
     hood = new TalonFX(hoodConstants.HOOD_MOTOR_ID, new CANBus("rio"));
     var hoodConfigure = new TalonFXConfiguration();
     hoodConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
@@ -65,24 +79,37 @@ public StatusSignal<Angle> getHoodPosition(){
     return hood.getPosition();
 }
 
-public HoodStates CurrentState = HoodStates.idle;
+public void setCurrentState(HoodStates state){
+    CurrentState = state;
+}
 
 @Override
 public void periodic(){
     switch (CurrentState) {
-        case idle:
+        case Idle:
             this.setHoodStop();
             
         break;
 
-        case up:
+        case Up:
+            //TODO:  nothing is setting velocity
             this.setHoodUpVelocity(velocity);
 
         break;
 
-        case down:
+        case Down:
             this.setHoodDownVelocity(velocity);
 
+        break;
+
+        case PositionShoot:
+            this.setHoodPosition(0);
+
+        break;
+
+        case PositionPass:
+            this.setHoodPosition(0);
+        
         break;
     }
 }
