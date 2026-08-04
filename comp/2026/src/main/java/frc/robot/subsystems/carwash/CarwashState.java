@@ -16,14 +16,12 @@ import frc.robot.subsystems.hood.HoodState.HoodStates;
 
 //TODO: fix tabbing/spacing
 public class CarwashState extends SubsystemBase{
-    //TOOD: why public?
     private TalonFX carwash;
 
     public CarwashState() {
         configureCarwash();
     }
     
-    // TODO: why no explicit access modifier
     private final VelocityVoltage carwashPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
     private double velocity;
 
@@ -35,10 +33,8 @@ public class CarwashState extends SubsystemBase{
         Reverse,
 }
 
-// TODO:  shouldn't expose public fields
 private CarwashStates CurrentState = CarwashStates.Idle;
 
-    //TODO:  what executes this?
     public void configureCarwash(){
         carwash = new TalonFX(carwashConstants.CARWASH_WASHER_MOTOR_ID, new CANBus("rio"));
         var carwashConfigure = new TalonFXConfiguration();
@@ -83,7 +79,6 @@ public void periodic(){
         break;
 
         case Foward:
-            //TODO:  nothing is setting velocity
             this.setCarwashForwardVelocity(carwashConstants.CARWASH_SPIN_VELOCITY);
 
         break;

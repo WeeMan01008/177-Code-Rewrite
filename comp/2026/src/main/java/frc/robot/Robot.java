@@ -7,10 +7,12 @@ package frc.robot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.intakeConstants;
+import frc.robot.Constants.shooterConstants;
 import frc.robot.subsystems.intake.IntakeState;
 
 /**
@@ -48,7 +50,11 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-   // Logger.recordOutput("IntakePosition", m_robotContainer.intake.getIntakePosition().getValueAsDouble());
+     RobotState.getInstance().setDistanceToHub(
+      Units.metersToInches(
+        Math.sqrt(Math.pow(RobotState.getInstance().hubLocation.getX()-m_robotContainer.drive.getPose().getX(), 2) +
+        Math.pow(RobotState.getInstance().hubLocation.getY()-m_robotContainer.drive.getPose().getY(), 2))
+      ) - shooterConstants.SHOOTING_OFFSET);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

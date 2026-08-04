@@ -32,10 +32,8 @@ import frc.robot.subsystems.intake.IntakeState.IntakeStates;
         Reverse,
 }
 
-// TODO:  shouldn't expose public fields
 private HotdogStates CurrentState = HotdogStates.Idle;
 
-//TODO:  what executes this?
 public void configureHotdog(){
     hotdog = new TalonFX(hotdogConstants.HOTDOG_MOTOR_ID, new CANBus("rio"));
     var hotdogConfigure = new TalonFXConfiguration();
@@ -80,13 +78,12 @@ public void periodic(){
         break;
 
         case Forward:
-            //TODO:  nothing is setting velocity
-            this.setHotdogVelocity(velocity);
+            this.setHotdogVelocity(hotdogConstants.TEST_VELOCITY);
 
         break;
 
         case Reverse:
-            this.setHotdogReverseVelocity(velocity);
+            this.setHotdogReverseVelocity(hotdogConstants.TEST_VELOCITY);
 
         break;
     }

@@ -1,6 +1,9 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.shooterConstants;
 import frc.robot.subsystems.carwash.CarwashState;
 import frc.robot.subsystems.carwash.CarwashState.CarwashStates;
 import frc.robot.subsystems.hood.HoodState;
@@ -12,12 +15,27 @@ import frc.robot.subsystems.intake.IntakeState.IntakeStates;
 import frc.robot.subsystems.shooter.ShooterState;
 import frc.robot.subsystems.shooter.ShooterState.ShooterStates;
 
+import org.bobcatrobotics.GameSpecific.Rebuilt.HubUtil;
+//import org.bobcatrobotics.Util.DoubleOutPutInterpolator;
+
 public class RobotState extends SubsystemBase {
+    private static RobotState instance;
+    private double distanceToHub = 0.0;
+    private double distanceToPass = 0.0;
+    private double passingVelocity = shooterConstants.SHOOTER_SPEEDS[0];
+    private double shooterVelocity = shooterConstants.PASSING_SPEEDS[0];
+
     private IntakeState intakeState = new IntakeState();
     private ShooterState shooterState = new ShooterState();
     private HotdogState hotdogState = new HotdogState();
     private HoodState hoodState = new HoodState();
     private CarwashState carwashState = new CarwashState();
+    private Alliance alliance = Alliance.Red;
+
+    public Translation2d hubLocation = HubUtil.getMyHubCoordinates(alliance).toPose2d().getTranslation();
+
+    //public DoubleOutPutInterpolator shootingInterpolator = new DoubleOutPutInterpolator();
+    //public DoubleOutPutInterpolator passingInterpolator = new DoubleOutPutInterpolator();
 
     public enum RobotStates {
         Idle,
@@ -35,9 +53,26 @@ public class RobotState extends SubsystemBase {
 
     private RobotStates CurrentState = RobotStates.Idle;
 
+    public static RobotState getInstance() {
+      if (instance == null)
+      {
+        instance = new RobotState();
+      }
+      return instance;
+    }
+
+    public void setAlliance(Alliance alliance) {
+      this.alliance = alliance;
+}
+
     public void setCurrentState(RobotStates state){
         CurrentState = state;
 }
+
+    public void setDistanceToHub(double distance) { 
+        distanceToHub = distance; 
+        //shooterVelocity = shootingInterpolator.getAsList(distanceToHub).get(0);
+    }
 
     @Override
     public void periodic(){

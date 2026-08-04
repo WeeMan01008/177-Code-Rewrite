@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import frc.robot.Constants.shooterConstants;
+import frc.robot.RobotState.RobotStates;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.carwash.Carwash;
@@ -41,7 +43,7 @@ public class RobotContainer {
   private final HoodState hood = new HoodState();
   private final IntakeState intake = new IntakeState();
   private final HotdogState hotdog = new HotdogState();
-  //private final RobotState robotState = new RobotState();
+  private final RobotState robotState = new RobotState();
   public final Vision vision;
   public final Drive drive;
 
@@ -130,17 +132,15 @@ public class RobotContainer {
                         () -> -driverController.getLeftX(),
                         () -> -driverController.getRightX()));
 
-    driverController.a()
-    .whileTrue(Commands.runOnce(() -> carwash.setCurrentState(CarwashStates.Foward),carwash))
-    .onFalse(Commands.runOnce(() -> carwash.setCurrentState(CarwashStates.Idle), carwash));
+    driverController.rightBumper()
+    .whileTrue(Commands.runOnce(() -> robotState.setCurrentState(RobotStates.Intake), robotState)
+    .withTimeout(shooterConstants.SHOOTING_SPINUP)
+    .andThen(Commands.runOnce(() -> robotState.setCurrentState(RobotStates.Shoot), robotState)))
+    .onFalse(Commands.runOnce(() -> robotState.setCurrentState(RobotStates.Idle), robotState));
 
-    driverController.b()
-    .whileTrue(Commands.runOnce(() -> intake.setCurrentState(IntakeStates.IntakeDeployed),intake))
-    .onFalse(Commands.runOnce(() -> intake.setCurrentState(IntakeStates.Idle), intake));
-
-    driverController.y()
-    .whileTrue(Commands.runOnce(() -> intake.setCurrentState(IntakeStates.IntakeStored),intake))
-    .onFalse(Commands.runOnce(() -> intake.setCurrentState(IntakeStates.Idle), intake));
+    driverController.leftBumper()
+    .whileTrue(Commands.run(() -> robotState.setCurrentState(RobotStates.SpinUp), robotState))
+    .onFalse(Commands.runOnce(() -> robotState.setCurrentState(RobotStates.Idle), robotState));
 
     //driverController.b().onTrue(Commands.runOnce(()-> intake.setCurrentState(IntakeStates.IntakeDeployed)));
   }

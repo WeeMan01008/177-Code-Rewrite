@@ -36,6 +36,7 @@ public final class Constants {
     public static final double[] HOOD_POSITION_SHOOTING = {};
     public static final double[] HOOD_POSITION_PASSING = {};
 
+    public static final double HOOD_TEST_POSITION = 0;
   }
 
   public static class shooterConstants{
@@ -56,6 +57,13 @@ public final class Constants {
 
     public static final double[] PASSING_SPEEDS = {};
 
+    public static final double SHOOTING_TEST_SPEEDS = 30;
+
+    public static final double SHOOTING_SPINUP = 0.5;
+    public static final double PASSING_SPINUP = 0.75;
+
+    public static final double SHOOTING_OFFSET = 23.5 + 0; //23.5 is half of hub and ___ is half of robot
+
   }
 
   public static class intakeConstants{
@@ -66,8 +74,8 @@ public final class Constants {
 
     public static final int STATOR_CURRENT_LIMIT = 70;
 
-    public static final double INTAKE_VELOCITY = 0;
-    public static final double OUTTAKE_VELOCITY = 0;
+    public static final double INTAKE_VELOCITY = 40;
+    public static final double OUTTAKE_VELOCITY = 40;
 
     public static final double INTAKE_DEPLOYED_POSITION = 11.522;
     public static final double INTAKE_STORED_POSITION = -0.155;
@@ -77,6 +85,8 @@ public final class Constants {
   public static class hotdogConstants{
   //Constant for hotdog motor ID
     public static final int HOTDOG_MOTOR_ID = 16;
+
+    public static final double TEST_VELOCITY = 30;
 
   }
 

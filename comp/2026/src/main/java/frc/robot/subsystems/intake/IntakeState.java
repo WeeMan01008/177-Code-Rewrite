@@ -19,7 +19,6 @@ import frc.robot.subsystems.shooter.ShooterState.ShooterStates;
 
 //TODO: fix tabbing/spacing
     public class IntakeState extends SubsystemBase{
-    //TOOD: why public?
         private TalonFX intakeDeploy;
         private TalonFX rightIntakeRoller;
         private TalonFX leftIntakeRoller;
@@ -29,9 +28,7 @@ import frc.robot.subsystems.shooter.ShooterState.ShooterStates;
             configureIntakeRollers();
         }   
 
-        // TODO: why no explicit access modifier
         private final VelocityVoltage intakeRollerPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
-        //TODO:  do you think there is a different control request that would be better for deploy?
         private final PositionVoltage intakeDeployPositionRequest = new PositionVoltage(0);
         private double velocity;
         private double angle;
@@ -129,7 +126,6 @@ public void periodic(){
         break;
 
         case IntakeDeployed:
-            //TODO:  nothing is setting angle
             this.setIntakeDeployedAngle(intakeConstants.INTAKE_DEPLOYED_POSITION);
 
         break;
@@ -140,13 +136,12 @@ public void periodic(){
         break;
 
         case Intake:
-            //TODO:  nothing is setting velocity
-            this.setRightIntakeRollerVelocity(velocity);
+            this.setRightIntakeRollerVelocity(intakeConstants.INTAKE_VELOCITY);
 
         break;
 
         case Outtake:
-            this.setRightIntakeRollerVelocity(velocity);
+            this.setRightIntakeRollerOuttakeVelocity(intakeConstants.OUTTAKE_VELOCITY);
     }
 }
 }

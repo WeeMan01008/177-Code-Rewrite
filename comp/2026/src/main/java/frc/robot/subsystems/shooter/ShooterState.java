@@ -16,7 +16,6 @@ import frc.robot.Constants.shooterConstants;
 
 //TODO: fix tabbing/spacing
     public class ShooterState extends SubsystemBase{
-        //TOOD: why public?
         //motors listed as viewed from back of the robot
         private TalonFX topRightShooter;
         private TalonFX topLeftShooter;
@@ -27,7 +26,6 @@ import frc.robot.Constants.shooterConstants;
             configureTopRightShooter();
         }   
 
-        // TODO: why no explicit access modifier
         private final VelocityVoltage shooterMotorPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
         private double velocity;
 
@@ -38,11 +36,8 @@ import frc.robot.Constants.shooterConstants;
         Pass
 }
 
-
-    // TODO:  shouldn't expose public fields
     private ShooterStates CurrentState = ShooterStates.Idle;
 
-    //TODO:  what executes this?
     public void configureTopRightShooter(){
         topRightShooter = new TalonFX(shooterConstants.TOPRIGHT_SHOOTER_MOTOR_ID, new CANBus("rio"));
         bottomRightShooter = new TalonFX(shooterConstants.BOTTOMRIGHT_SHOOTER_MOTOR_ID, new CANBus("rio"));
@@ -106,8 +101,7 @@ import frc.robot.Constants.shooterConstants;
             break;
 
             case Shoot:
-                //TODO:  nothing is setting velocity
-                this.setTopRightShooterVelocity(velocity);
+                this.setTopRightShooterVelocity(shooterConstants.SHOOTING_TEST_SPEEDS);
 
             break;
 
