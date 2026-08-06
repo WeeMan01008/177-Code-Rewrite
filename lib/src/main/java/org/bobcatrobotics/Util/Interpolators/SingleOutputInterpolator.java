@@ -64,12 +64,12 @@ public final class SingleOutputInterpolator implements InterpolatorIO{
             oneSlopes[i] = (oneSpeeds[i + 1] - oneSpeeds[i]) / dx;
         }
     }
-        
+
     public List<Double> getAsList(double distance){
         Speeds speeds = get(distance);
         return speeds.getAsList();
     }
-    
+
     /**
      * Gets interpolated (or extrapolated) speeds.
      *

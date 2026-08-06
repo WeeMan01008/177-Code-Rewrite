@@ -15,7 +15,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.intakeConstants;
-import frc.robot.subsystems.shooter.ShooterState.ShooterStates;
 
 //TODO: fix tabbing/spacing
     public class IntakeState extends SubsystemBase{
@@ -52,7 +51,7 @@ public void configureIntakeDeploy(){
     intakeDeployConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     intakeDeployConfigure.Slot0.kS = 0;
     intakeDeployConfigure.Slot0.kV = 0;
-    intakeDeployConfigure.Slot0.kP = 0;
+    intakeDeployConfigure.Slot0.kP = 1;
     intakeDeployConfigure.Slot0.kI = 0;
     intakeDeployConfigure.Slot0.kD = 0;
     intakeDeploy.getConfigurator().apply(intakeDeployConfigure);
@@ -65,7 +64,7 @@ public void configureIntakeRollers(){
     intakeRollersConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
     intakeRollersConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
     intakeRollersConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    intakeRollersConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    intakeRollersConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     intakeRollersConfigure.Slot0.kS = 0;
     intakeRollersConfigure.Slot0.kV = 0.11;
     intakeRollersConfigure.Slot0.kP = 1;
@@ -77,11 +76,11 @@ public void configureIntakeRollers(){
 }
 
 public void setIntakeDeployedAngle(double angle) {
-    intakeDeploy.setControl(intakeDeployPositionRequest.withPosition(angle).withFeedForward(2));
+    intakeDeploy.setControl(intakeDeployPositionRequest.withPosition(angle).withFeedForward(1));
 }
 
 public void setIntakeStoredAngle(double angle) {
-    intakeDeploy.setControl(intakeDeployPositionRequest.withPosition(angle).withFeedForward(-2));
+    intakeDeploy.setControl(intakeDeployPositionRequest.withPosition(angle).withFeedForward(-1.6));
 }
 
 public void setIntakeDeployedStop(){

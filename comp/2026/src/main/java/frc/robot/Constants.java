@@ -57,9 +57,9 @@ public final class Constants {
 
     public static final double[] PASSING_SPEEDS = {};
 
-    public static final double SHOOTING_TEST_SPEEDS = 30;
+    public static final double SHOOTING_TEST_SPEEDS = 40;
 
-    public static final double SHOOTING_SPINUP = 0.5;
+    public static final double SHOOTING_SPINUP = 1;
     public static final double PASSING_SPINUP = 0.75;
 
     public static final double SHOOTING_OFFSET = 23.5 + 0; //23.5 is half of hub and ___ is half of robot
@@ -74,11 +74,11 @@ public final class Constants {
 
     public static final int STATOR_CURRENT_LIMIT = 70;
 
-    public static final double INTAKE_VELOCITY = 40;
-    public static final double OUTTAKE_VELOCITY = 40;
+    public static final double INTAKE_VELOCITY = 70;
+    public static final double OUTTAKE_VELOCITY = 70;
 
-    public static final double INTAKE_DEPLOYED_POSITION = 11.522;
-    public static final double INTAKE_STORED_POSITION = -0.155;
+    public static final double INTAKE_DEPLOYED_POSITION = 11;
+    public static final double INTAKE_STORED_POSITION = -0.15;
 
   }
 
@@ -86,7 +86,7 @@ public final class Constants {
   //Constant for hotdog motor ID
     public static final int HOTDOG_MOTOR_ID = 16;
 
-    public static final double TEST_VELOCITY = 30;
+    public static final double TEST_VELOCITY = 50;
 
   }
 
@@ -94,6 +94,7 @@ public final class Constants {
   //Constants for carwash motor ID's
     public static final int CARWASH_WASHER_MOTOR_ID = 15;
 
-    public static final double CARWASH_SPIN_VELOCITY = 25;
+    public static final double CARWASH_SPIN_VELOCITY = 35;
+    public static final double CARWASH_SPIN_REVERSE_VELOCITY = 35;
   }
 }

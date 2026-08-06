@@ -50,7 +50,7 @@ import frc.robot.Constants.shooterConstants;
         shooterConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         shooterConfigure.Slot0.kS = 0;
         shooterConfigure.Slot0.kV = 0;
-        shooterConfigure.Slot0.kP = 0;
+        shooterConfigure.Slot0.kP = 1;
         shooterConfigure.Slot0.kI = 0;
         shooterConfigure.Slot0.kD = 0;
         topRightShooter.getConfigurator().apply(shooterConfigure);

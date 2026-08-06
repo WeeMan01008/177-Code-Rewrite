@@ -40,10 +40,10 @@ public void configureHotdog(){
     hotdogConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
     hotdogConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
     hotdogConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    hotdogConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    hotdogConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     hotdogConfigure.Slot0.kS = 0;
     hotdogConfigure.Slot0.kV = 0;
-    hotdogConfigure.Slot0.kP = 0;
+    hotdogConfigure.Slot0.kP = 1;
     hotdogConfigure.Slot0.kI = 0;
     hotdogConfigure.Slot0.kD = 0;
     hotdog.getConfigurator().apply(hotdogConfigure);

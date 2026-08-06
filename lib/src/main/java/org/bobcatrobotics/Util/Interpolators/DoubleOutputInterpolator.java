@@ -74,12 +74,12 @@ public final class DoubleOutputInterpolator implements InterpolatorIO{
             twoSlopes[i] = (twoSpeeds[i + 1] - twoSpeeds[i]) / dx;
         }
     }
-        
+
     public List<Double> getAsList(double distance){
         Speeds speeds = get(distance);
         return speeds.getAsList();
     }
-    
+
     /**
      * Gets interpolated (or extrapolated) speeds.
      *

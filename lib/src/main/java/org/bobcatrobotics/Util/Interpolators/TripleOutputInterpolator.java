@@ -84,7 +84,7 @@ public final class TripleOutputInterpolator implements InterpolatorIO{
             threeSlopes[i] = (threeSpeeds[i + 1] - threeSpeeds[i]) / dx;
         }
     }
-        
+
     public List<Double> getAsList(double distance){
         Speeds speeds = get(distance);
         return speeds.getAsList();

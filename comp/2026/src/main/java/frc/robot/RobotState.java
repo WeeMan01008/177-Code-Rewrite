@@ -2,8 +2,9 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.shooterConstants;
 import frc.robot.subsystems.carwash.CarwashState;
 import frc.robot.subsystems.carwash.CarwashState.CarwashStates;
 import frc.robot.subsystems.hood.HoodState;
@@ -16,26 +17,32 @@ import frc.robot.subsystems.shooter.ShooterState;
 import frc.robot.subsystems.shooter.ShooterState.ShooterStates;
 
 import org.bobcatrobotics.GameSpecific.Rebuilt.HubUtil;
-//import org.bobcatrobotics.Util.DoubleOutPutInterpolator;
+import org.bobcatrobotics.Util.Interpolators.*;
+
+import com.ctre.phoenix6.StatusSignal;
 
 public class RobotState extends SubsystemBase {
     private static RobotState instance;
     private double distanceToHub = 0.0;
+    private double distanceToCenterLineY = 0.0;
+    private double distanceToCenterHubX = 0.0;
+    private double angleToHub = 0.0;
     private double distanceToPass = 0.0;
-    private double passingVelocity = shooterConstants.SHOOTER_SPEEDS[0];
-    private double shooterVelocity = shooterConstants.PASSING_SPEEDS[0];
+    //private double passingVelocity = shooterConstants.SHOOTER_SPEEDS[0];
+    //private double shooterVelocity = shooterConstants.PASSING_SPEEDS[0];
 
     private IntakeState intakeState = new IntakeState();
-    private ShooterState shooterState = new ShooterState();
+    private ShooterState shooterState  = new ShooterState();
     private HotdogState hotdogState = new HotdogState();
-    private HoodState hoodState = new HoodState();
+    private HoodState hoodState  = new HoodState();
     private CarwashState carwashState = new CarwashState();
+    
     private Alliance alliance = Alliance.Red;
 
     public Translation2d hubLocation = HubUtil.getMyHubCoordinates(alliance).toPose2d().getTranslation();
 
-    //public DoubleOutPutInterpolator shootingInterpolator = new DoubleOutPutInterpolator();
-    //public DoubleOutPutInterpolator passingInterpolator = new DoubleOutPutInterpolator();
+    //public DoubleOutputInterpolator shootingInterpolator = new DoubleOutputInterpolator(shooterConstants.SHOOTING_DISTANCES, shooterConstants.SHOOTER_SPEEDS, hoodConstants.HOOD_POSITION_SHOOTING, false);
+    //public DoubleOutputInterpolator passingInterpolator = new DoubleOutputInterpolator(shooterConstants.PASSING_DISTANCES, shooterConstants.PASSING_SPEEDS, hoodConstants.HOOD_POSITION_PASSING, false);
 
     public enum RobotStates {
         Idle,
@@ -64,6 +71,9 @@ public class RobotState extends SubsystemBase {
     public void setAlliance(Alliance alliance) {
       this.alliance = alliance;
 }
+    public Alliance getAlliance() {
+      return alliance;
+}
 
     public void setCurrentState(RobotStates state){
         CurrentState = state;
@@ -72,6 +82,89 @@ public class RobotState extends SubsystemBase {
     public void setDistanceToHub(double distance) { 
         distanceToHub = distance; 
         //shooterVelocity = shootingInterpolator.getAsList(distanceToHub).get(0);
+    }
+
+    public double getDistanceToHub() { 
+        return distanceToHub;
+    }
+
+    public void setDistanceToCenterLineY(double distance){
+        distanceToCenterLineY = distance;
+    }
+
+    public double getDistanceToCenterLineY(){
+        return distanceToCenterLineY;
+    }
+
+    public void setDistanceToCenterHubX(double distance){
+        distanceToCenterHubX = distance;
+    }
+
+    public double getDistanceToCenterHubX(){
+        return distanceToCenterHubX;
+    }
+
+    public void setAngleToHub(double angle){
+        angleToHub = angle;
+    }
+
+    public double getAngleToHub(){
+        return angleToHub;
+    }
+
+    public Command setStateIdle(){
+        return Commands.runOnce(() -> setCurrentState(RobotStates.Idle), 
+        shooterState, intakeState, hotdogState, hoodState, carwashState);
+    }
+
+    public Command setStateShoot(){
+        return Commands.runOnce(() -> setCurrentState(RobotStates.Shoot),
+        shooterState, intakeState, hotdogState, hoodState, carwashState);
+    }
+
+    public Command setStatePass(){
+        return Commands.runOnce(() -> setCurrentState(RobotStates.Pass),
+        shooterState, intakeState, hotdogState, hoodState, carwashState);
+    }
+
+    public Command setStateSpinUp(){
+        return Commands.run(() -> setCurrentState(RobotStates.SpinUp),
+        shooterState, intakeState, hotdogState, hoodState, carwashState);
+    }
+
+    public Command setStateIntake(){
+        return Commands.runOnce(() -> setCurrentState(RobotStates.Intake),
+        shooterState, intakeState, hotdogState, hoodState, carwashState);
+    }
+
+    public Command setStateOuttake(){
+        return Commands.runOnce(() -> setCurrentState(RobotStates.Outtake),
+        shooterState, intakeState, hotdogState, hoodState, carwashState);
+    }
+
+    public Command setStateUnjam(){
+        return Commands.runOnce(() -> setCurrentState(RobotStates.Unjam), 
+        shooterState, intakeState, hotdogState, hoodState, carwashState);
+    }
+
+    public Command setStateIntakeStored(){
+        return Commands.runOnce(() -> setCurrentState(RobotStates.IntakeStored),
+        shooterState, intakeState, hotdogState, hoodState, carwashState);
+    }
+
+    public Command setStateIntakeDeploy(){
+        return Commands.runOnce(() -> setCurrentState(RobotStates.IntakeDeployed),
+        shooterState, intakeState, hotdogState, hoodState, carwashState);
+    }
+
+    public Command setStateAlignToPass(){
+        return Commands.runOnce(() -> setCurrentState(RobotStates.AlignToPass), 
+        shooterState, intakeState, hotdogState, hoodState, carwashState);
+    }
+
+    public Command setStateAlignToHub(){
+        return Commands.runOnce(() -> setCurrentState(RobotStates.AlignToHub), 
+        shooterState, intakeState, hotdogState, hoodState, carwashState);
     }
 
     @Override
@@ -90,7 +183,7 @@ public class RobotState extends SubsystemBase {
                 shooterState.setCurrentState(ShooterStates.Shoot);
                 intakeState.setCurrentState(IntakeStates.Idle);
                 hotdogState.setCurrentState(HotdogStates.Forward);
-                hoodState.setCurrentState(HoodStates.PositionShoot);
+                //hoodState.setCurrentState(HoodStates.PositionShoot);
                 carwashState.setCurrentState(CarwashStates.Foward);
 
             break;

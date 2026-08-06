@@ -4,16 +4,16 @@
 
 package frc.robot;
 
+import org.bobcatrobotics.GameSpecific.Rebuilt.HubUtil;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Constants.intakeConstants;
 import frc.robot.Constants.shooterConstants;
-import frc.robot.subsystems.intake.IntakeState;
+import frc.robot.subsystems.hood.HoodState;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -23,7 +23,8 @@ import frc.robot.subsystems.intake.IntakeState;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  private final RobotContainer m_robotContainer;
+  private final RobotContainer robotContainer;
+  private final HoodState HoodState;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -32,7 +33,8 @@ public class Robot extends TimedRobot {
   public Robot() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
+    HoodState = new HoodState();
   }
 
   /**
@@ -50,11 +52,25 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
+    if (DriverStation.getAlliance().isPresent()){
+      RobotState.getInstance().setAlliance(DriverStation.getAlliance().get());
+      RobotState.getInstance().hubLocation = HubUtil.getMyHubCoordinates(DriverStation.getAlliance().get()).toPose2d().getTranslation();
+    }
+
      RobotState.getInstance().setDistanceToHub(
       Units.metersToInches(
-        Math.sqrt(Math.pow(RobotState.getInstance().hubLocation.getX()-m_robotContainer.drive.getPose().getX(), 2) +
-        Math.pow(RobotState.getInstance().hubLocation.getY()-m_robotContainer.drive.getPose().getY(), 2))
+        Math.sqrt(Math.pow(RobotState.getInstance().hubLocation.getX()-robotContainer.drive.getPose().getX(), 2) +
+        Math.pow(RobotState.getInstance().hubLocation.getY()-robotContainer.drive.getPose().getY(), 2))
       ) - shooterConstants.SHOOTING_OFFSET);
+
+    RobotState.getInstance().setDistanceToCenterLineY(HubUtil.halfFieldY - robotContainer.drive.getPose().getY());
+
+    RobotState.getInstance().setDistanceToCenterHubX(HubUtil.hubPosition(DriverStation.getAlliance().get()).getX() - robotContainer.drive.getPose().getX());
+
+    RobotState.getInstance().setAngleToHub(Math.acos(Math.pow(RobotState.getInstance().getDistanceToCenterHubX(), 2) - (Math.pow(RobotState.getInstance().getDistanceToCenterLineY(), 2) * Math.pow(RobotState.getInstance().getDistanceToHub(), 2))/ -2 * (RobotState.getInstance().getDistanceToCenterLineY() * RobotState.getInstance().getDistanceToHub())));
+
+    Logger.recordOutput("Hood_Position", HoodState.getHoodPosition().getValueAsDouble());
+    Logger.recordOutput("Distance_To_Hub", RobotState.getInstance().getDistanceToHub());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -67,7 +83,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {

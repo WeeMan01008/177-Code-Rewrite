@@ -3,18 +3,16 @@ package frc.robot.subsystems.hood;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.hoodConstants;
 import frc.robot.Constants.intakeConstants;
-import frc.robot.subsystems.hotdog.HotdogState.HotdogStates;
 
 //TODO: fix tabbing/spacing
 public class HoodState extends SubsystemBase{
@@ -24,8 +22,7 @@ public class HoodState extends SubsystemBase{
         configureHood();
     }
 
-    private final PositionVoltage HoodPositionRequest = new PositionVoltage(null);
-    private double velocity;
+    private final MotionMagicVoltage hoodPositionRequest = new MotionMagicVoltage(0);
 
     public enum HoodStates {
         Idle, 
@@ -36,18 +33,25 @@ public class HoodState extends SubsystemBase{
 private HoodStates CurrentState = HoodStates.Idle;
 
 public void configureHood(){
+    var talonFXConfigs = new TalonFXConfiguration();
     hood = new TalonFX(hoodConstants.HOOD_MOTOR_ID, new CANBus("rio"));
-    var hoodConfigure = new TalonFXConfiguration();
+    var hoodConfigure = talonFXConfigs;
     hoodConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
     hoodConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
     hoodConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     hoodConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    hoodConfigure.Slot0.kS = 0;
-    hoodConfigure.Slot0.kV = 0;
+    hoodConfigure.Slot0.kS = 0.25;
+    hoodConfigure.Slot0.kV = 0.12;
     hoodConfigure.Slot0.kP = 1;
     hoodConfigure.Slot0.kI = 0;
     hoodConfigure.Slot0.kD = 0;
-    hood.getConfigurator().apply(hoodConfigure);
+
+    var motionMagicConfigs = talonFXConfigs.MotionMagic;
+    motionMagicConfigs.MotionMagicCruiseVelocity = 80;
+    motionMagicConfigs.MotionMagicAcceleration = 160;
+    motionMagicConfigs.MotionMagicJerk = 1600;
+
+    hood.getConfigurator().apply(talonFXConfigs);
 }
 
 public void setHoodStop(){
@@ -55,7 +59,7 @@ public void setHoodStop(){
 }
 
 public void setHoodPosition(double angle) {
-    hood.setControl(HoodPositionRequest.withPosition(angle).withFeedForward(0.5));
+    hood.setControl(hoodPositionRequest.withPosition(angle));
 }
 
 public StatusSignal<Angle> getHoodPosition(){

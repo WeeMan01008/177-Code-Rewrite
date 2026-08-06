@@ -12,7 +12,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.carwashConstants;
 import frc.robot.Constants.intakeConstants;
-import frc.robot.subsystems.hood.HoodState.HoodStates;
 
 //TODO: fix tabbing/spacing
 public class CarwashState extends SubsystemBase{
@@ -23,7 +22,6 @@ public class CarwashState extends SubsystemBase{
     }
     
     private final VelocityVoltage carwashPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
-    private double velocity;
 
     
     public enum CarwashStates {
@@ -41,7 +39,7 @@ private CarwashStates CurrentState = CarwashStates.Idle;
         carwashConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
         carwashConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
         carwashConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        carwashConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        carwashConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         carwashConfigure.Slot0.kS = 0;
         carwashConfigure.Slot0.kV = 0.11;
         carwashConfigure.Slot0.kP = 1;
@@ -84,7 +82,7 @@ public void periodic(){
         break;
 
         case Reverse:
-            this.setCarwashReverseVelocity(velocity);
+            this.setCarwashReverseVelocity(carwashConstants.CARWASH_SPIN_REVERSE_VELOCITY);
 
         break;
     }

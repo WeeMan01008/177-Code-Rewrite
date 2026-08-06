@@ -5,28 +5,25 @@
 package frc.robot;
 
 import frc.robot.Constants.shooterConstants;
-import frc.robot.RobotState.RobotStates;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.carwash.Carwash;
-import frc.robot.subsystems.carwash.CarwashState;
-import frc.robot.subsystems.carwash.CarwashState.CarwashStates;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.hood.HoodState;
-import frc.robot.subsystems.hotdog.HotdogState;
-import frc.robot.subsystems.intake.IntakeState;
-import frc.robot.subsystems.intake.IntakeState.IntakeStates;
-import frc.robot.subsystems.shooter.ShooterState;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.subsystems.vision.VisionConstants;
+
+import org.bobcatrobotics.Commands.ActionFactory;
+//import frc.robot.util.AllianceFlipUtil;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -38,11 +35,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ShooterState shooter = new ShooterState();
-  private final CarwashState carwash = new CarwashState();
-  private final HoodState hood = new HoodState();
-  private final IntakeState intake = new IntakeState();
-  private final HotdogState hotdog = new HotdogState();
   private final RobotState robotState = new RobotState();
   public final Vision vision;
   public final Drive drive;
@@ -132,15 +124,43 @@ public class RobotContainer {
                         () -> -driverController.getLeftX(),
                         () -> -driverController.getRightX()));
 
+    driverController.povUp().whileTrue
+              (DriveCommands.joystickDriveAtAngle(
+                drive, 
+                () -> -driverController.getLeftY(), 
+                () -> -driverController.getLeftX(), 
+                () -> new Rotation2d(robotState.getAngleToHub())));
+
+    driverController.x()
+            .onTrue(new ActionFactory().singleAction("X-Command", () -> drive.stopWithX(), drive));
+
+    driverController.b()
+            .onTrue(new ActionFactory().singleAction("ZeroGyroCommand",
+                () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(),
+                AllianceFlipUtil.apply(Rotation2d.kZero))),
+                drive).ignoringDisable(true));
+
     driverController.rightBumper()
-    .whileTrue(Commands.runOnce(() -> robotState.setCurrentState(RobotStates.Intake), robotState)
-    .withTimeout(shooterConstants.SHOOTING_SPINUP)
-    .andThen(Commands.runOnce(() -> robotState.setCurrentState(RobotStates.Shoot), robotState)))
-    .onFalse(Commands.runOnce(() -> robotState.setCurrentState(RobotStates.Idle), robotState));
+    .whileTrue(robotState.setStateSpinUp()
+      .withTimeout(shooterConstants.SHOOTING_SPINUP)
+      .andThen(robotState.setStateShoot()))
+    .onFalse(robotState.setStateIdle());
 
     driverController.leftBumper()
-    .whileTrue(Commands.run(() -> robotState.setCurrentState(RobotStates.SpinUp), robotState))
-    .onFalse(Commands.runOnce(() -> robotState.setCurrentState(RobotStates.Idle), robotState));
+    .whileTrue(robotState.setStateIntake())
+    .onFalse(robotState.setStateIdle());
+
+    driverController.leftTrigger()
+    .whileTrue(robotState.setStateOuttake())
+    .onFalse(robotState.setStateIdle());
+
+    driverController.a()
+    .whileTrue(robotState.setStateIntakeDeploy())
+    .onFalse(robotState.setStateIdle());
+
+    driverController.y()
+    .whileTrue(robotState.setStateIntakeStored())
+    .onFalse(robotState.setStateIdle());
 
     //driverController.b().onTrue(Commands.runOnce(()-> intake.setCurrentState(IntakeStates.IntakeDeployed)));
   }
@@ -153,5 +173,9 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return null;
+  }
+
+  public Pose2d getPose2D() {
+        return drive.getPose();
   }
 }
