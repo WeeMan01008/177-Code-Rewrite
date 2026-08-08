@@ -14,78 +14,77 @@ import frc.robot.Constants.hotdogConstants;
 import frc.robot.Constants.intakeConstants;
 import frc.robot.subsystems.intake.IntakeState.IntakeStates;
 
-//TODO: fix tabbing/spacing
-    public class HotdogState extends SubsystemBase{
-        private TalonFX hotdog;
+public class HotdogState extends SubsystemBase {
+    private TalonFX hotdog;
 
-        public HotdogState() {
-            configureHotdog();
-        }
+    public HotdogState() {
+        configureHotdog();
+    }
 
-        private final VelocityVoltage HotdogPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
-        private double velocity;
+    private final VelocityVoltage HotdogPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
+    private double velocity;
 
     public enum HotdogStates {
-        Idle, 
-        //forward is toward carwash and reverse is toward intake
+        Idle,
+        // forward is toward carwash and reverse is toward intake
         Forward,
         Reverse,
-}
-
-private HotdogStates CurrentState = HotdogStates.Idle;
-
-public void configureHotdog(){
-    hotdog = new TalonFX(hotdogConstants.HOTDOG_MOTOR_ID, new CANBus("rio"));
-    var hotdogConfigure = new TalonFXConfiguration();
-    hotdogConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
-    hotdogConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
-    hotdogConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    hotdogConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    hotdogConfigure.Slot0.kS = 0;
-    hotdogConfigure.Slot0.kV = 0;
-    hotdogConfigure.Slot0.kP = 1;
-    hotdogConfigure.Slot0.kI = 0;
-    hotdogConfigure.Slot0.kD = 0;
-    hotdog.getConfigurator().apply(hotdogConfigure);
-}
-
-public void setHotdogVelocity(double velocity) {
-    hotdog.setControl(HotdogPIDRequest.withVelocity(velocity));
-}
-
-public void setHotdogStop(){
-    hotdog.stopMotor();
-}
-
-public void setHotdogReverseVelocity(double velocity) {
-    hotdog.setControl(HotdogPIDRequest.withVelocity(-velocity));
-}
-
-public StatusSignal<AngularVelocity> getHotdogVelocity(){
-    return hotdog.getVelocity();
-}
-
-public void setCurrentState(HotdogStates state){
-    CurrentState = state;
-}
-
-@Override
-public void periodic(){
-    switch (CurrentState) {
-        case Idle:
-            this.setHotdogStop();
-            
-        break;
-
-        case Forward:
-            this.setHotdogVelocity(hotdogConstants.TEST_VELOCITY);
-
-        break;
-
-        case Reverse:
-            this.setHotdogReverseVelocity(hotdogConstants.TEST_VELOCITY);
-
-        break;
     }
-}
+
+    private HotdogStates CurrentState = HotdogStates.Idle;
+
+    public void configureHotdog() {
+        hotdog = new TalonFX(hotdogConstants.HOTDOG_MOTOR_ID, new CANBus("rio"));
+        var hotdogConfigure = new TalonFXConfiguration();
+        hotdogConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
+        hotdogConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
+        hotdogConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        hotdogConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        hotdogConfigure.Slot0.kS = 0;
+        hotdogConfigure.Slot0.kV = 0;
+        hotdogConfigure.Slot0.kP = 1;
+        hotdogConfigure.Slot0.kI = 0;
+        hotdogConfigure.Slot0.kD = 0;
+        hotdog.getConfigurator().apply(hotdogConfigure);
+    }
+
+    public void setHotdogVelocity(double velocity) {
+        hotdog.setControl(HotdogPIDRequest.withVelocity(velocity));
+    }
+
+    public void setHotdogStop() {
+        hotdog.stopMotor();
+    }
+
+    public void setHotdogReverseVelocity(double velocity) {
+        hotdog.setControl(HotdogPIDRequest.withVelocity(-velocity));
+    }
+
+    public StatusSignal<AngularVelocity> getHotdogVelocity() {
+        return hotdog.getVelocity();
+    }
+
+    public void setCurrentState(HotdogStates state) {
+        CurrentState = state;
+    }
+
+    @Override
+    public void periodic() {
+        switch (CurrentState) {
+            case Idle:
+                this.setHotdogStop();
+
+                break;
+
+            case Forward:
+                this.setHotdogVelocity(hotdogConstants.TEST_VELOCITY);
+
+                break;
+
+            case Reverse:
+                this.setHotdogReverseVelocity(hotdogConstants.TEST_VELOCITY);
+
+                break;
+        }
+    }
 }

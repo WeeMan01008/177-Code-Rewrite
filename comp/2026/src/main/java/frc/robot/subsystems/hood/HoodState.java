@@ -14,8 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.hoodConstants;
 import frc.robot.Constants.intakeConstants;
 
-//TODO: fix tabbing/spacing
-public class HoodState extends SubsystemBase{
+public class HoodState extends SubsystemBase {
     private TalonFX hood;
 
     public HoodState() {
@@ -25,68 +24,68 @@ public class HoodState extends SubsystemBase{
     private final MotionMagicVoltage hoodPositionRequest = new MotionMagicVoltage(0);
 
     public enum HoodStates {
-        Idle, 
+        Idle,
         PositionShoot,
         PositionPass
-}
-
-private HoodStates CurrentState = HoodStates.Idle;
-
-public void configureHood(){
-    var talonFXConfigs = new TalonFXConfiguration();
-    hood = new TalonFX(hoodConstants.HOOD_MOTOR_ID, new CANBus("rio"));
-    var hoodConfigure = talonFXConfigs;
-    hoodConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
-    hoodConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
-    hoodConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    hoodConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    hoodConfigure.Slot0.kS = 0.25;
-    hoodConfigure.Slot0.kV = 0.12;
-    hoodConfigure.Slot0.kP = 1;
-    hoodConfigure.Slot0.kI = 0;
-    hoodConfigure.Slot0.kD = 0;
-
-    var motionMagicConfigs = talonFXConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicCruiseVelocity = 80;
-    motionMagicConfigs.MotionMagicAcceleration = 160;
-    motionMagicConfigs.MotionMagicJerk = 1600;
-
-    hood.getConfigurator().apply(talonFXConfigs);
-}
-
-public void setHoodStop(){
-    hood.stopMotor();
-}
-
-public void setHoodPosition(double angle) {
-    hood.setControl(hoodPositionRequest.withPosition(angle));
-}
-
-public StatusSignal<Angle> getHoodPosition(){
-    return hood.getPosition();
-}
-
-public void setCurrentState(HoodStates state){
-    CurrentState = state;
-}
-
-@Override
-public void periodic(){
-    switch (CurrentState) {
-        case Idle:
-            this.setHoodStop();
-            
-        break;
-
-        case PositionShoot:
-            this.setHoodPosition(hoodConstants.HOOD_TEST_POSITION);
-
-        break;
-
-        case PositionPass:
-            this.setHoodPosition(hoodConstants.HOOD_TEST_POSITION);
-        
-        break;
     }
-}
+
+    private HoodStates CurrentState = HoodStates.Idle;
+
+    public void configureHood() {
+        var talonFXConfigs = new TalonFXConfiguration();
+        hood = new TalonFX(hoodConstants.HOOD_MOTOR_ID, new CANBus("rio"));
+        var hoodConfigure = talonFXConfigs;
+        hoodConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
+        hoodConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
+        hoodConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        hoodConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        hoodConfigure.Slot0.kS = 0.25;
+        hoodConfigure.Slot0.kV = 0.12;
+        hoodConfigure.Slot0.kP = 1;
+        hoodConfigure.Slot0.kI = 0;
+        hoodConfigure.Slot0.kD = 0;
+
+        var motionMagicConfigs = talonFXConfigs.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 80;
+        motionMagicConfigs.MotionMagicAcceleration = 160;
+        motionMagicConfigs.MotionMagicJerk = 1600;
+
+        hood.getConfigurator().apply(talonFXConfigs);
+    }
+
+    public void setHoodStop() {
+        hood.stopMotor();
+    }
+
+    public void setHoodPosition(double angle) {
+        hood.setControl(hoodPositionRequest.withPosition(angle));
+    }
+
+    public StatusSignal<Angle> getHoodPosition() {
+        return hood.getPosition();
+    }
+
+    public void setCurrentState(HoodStates state) {
+        CurrentState = state;
+    }
+
+    @Override
+    public void periodic() {
+        switch (CurrentState) {
+            case Idle:
+                this.setHoodStop();
+
+                break;
+
+            case PositionShoot:
+                this.setHoodPosition(hoodConstants.HOOD_TEST_POSITION);
+
+                break;
+
+            case PositionPass:
+                this.setHoodPosition(hoodConstants.HOOD_TEST_POSITION);
+
+                break;
+        }
+    }
 }

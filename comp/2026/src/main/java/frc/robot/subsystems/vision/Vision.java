@@ -9,15 +9,18 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+
 import static frc.robot.subsystems.vision.VisionConstants.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +33,11 @@ public class Vision extends SubsystemBase {
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
+
+  private MedianFilter xPoseFilter = new MedianFilter(5);
+  private MedianFilter yPoseFilter = new MedianFilter(5);
+  private MedianFilter rotPoseFilter = new MedianFilter(5);
+
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
     this.io = io;
@@ -40,6 +48,9 @@ public class Vision extends SubsystemBase {
       inputs[i] = new VisionIOInputsAutoLogged();
     }
 
+    for (limelightConstants camera : cameraConstants) {
+      LimelightHelpers.setCameraPose_RobotSpace(camera.name, camera.forward, camera.side, camera.up, camera.roll, camera.pitch, camera.yaw);
+    }
     // Initialize disconnected alerts
     this.disconnectedAlerts = new Alert[io.length];
     for (int i = 0; i < inputs.length; i++) {
@@ -60,6 +71,10 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+   
+    
+
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
@@ -84,6 +99,9 @@ public class Vision extends SubsystemBase {
 
       // Add tag poses
       for (int tagId : inputs[cameraIndex].tagIds) {
+        if (VisionConstants.IgnoreTags.contains(tagId)){
+          continue;
+        }
         var tagPose = aprilTagLayout.getTagPose(tagId);
         if (tagPose.isPresent()) {
           tagPoses.add(tagPose.get());
@@ -101,9 +119,9 @@ public class Vision extends SubsystemBase {
                     > maxZError // Must have realistic Z coordinate
 
                 // Must be within the field boundaries
-                || observation.pose().getX() < 0.0
+                || observation.pose().getX() <= 0.0
                 || observation.pose().getX() > aprilTagLayout.getFieldLength()
-                || observation.pose().getY() < 0.0
+                || observation.pose().getY() <= 0.0
                 || observation.pose().getY() > aprilTagLayout.getFieldWidth();
 
         // Add pose to log
@@ -119,26 +137,44 @@ public class Vision extends SubsystemBase {
           continue;
         }
 
-        // Calculate standard deviations
+        // Calculate standard deviations, further away from the tag , pose is less accurate , trust it less.
         double stdDevFactor =
-            Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
-        double linearStdDev = linearStdDevBaseline * stdDevFactor;
-        double angularStdDev = angularStdDevBaseline * stdDevFactor;
-        if (observation.type() == PoseObservationType.MEGATAG_2) {
-          linearStdDev *= linearStdDevMegatag2Factor;
-          angularStdDev *= angularStdDevMegatag2Factor;
-        }
-        if (cameraIndex < cameraStdDevFactors.length) {
-          linearStdDev *= cameraStdDevFactors[cameraIndex];
-          angularStdDev *= cameraStdDevFactors[cameraIndex];
-        }
+             Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+         double linearStdDev = linearStdDevBaseline * stdDevFactor;
+         double angularStdDev = angularStdDevBaseline * stdDevFactor;
+         if (observation.type() == PoseObservationType.MEGATAG_2) {
+           linearStdDev *= linearStdDevMegatag2Factor;
+           angularStdDev *= angularStdDevMegatag2Factor;
+         }
+         if (cameraIndex < cameraStdDevFactors.length) {
+           linearStdDev *= cameraStdDevFactors[cameraIndex];
+           angularStdDev *= cameraStdDevFactors[cameraIndex];
+         }
+
+         // Modified Code by Anand , non - dynamic distance based.
+        //double linearStdDev = linearStdDevMegatag2Base;
+        //double angularStdDev = angularStdDevMegatag2Base;
 
         // Send vision observation
-        consumer.accept(
-            observation.pose().toPose2d(),
-            observation.timestamp(),
-            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
-      }
+
+      // consumer.accept(
+      //      observation.pose().toPose2d(),
+      //        observation.timestamp(),
+      //        VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+      //  }  
+
+
+         Pose2d unfilteredPose =  observation.pose().toPose2d();
+         double xPose = xPoseFilter.calculate(unfilteredPose.getX());
+         double yPose = yPoseFilter.calculate(unfilteredPose.getY());
+         double rotPose = rotPoseFilter.calculate(unfilteredPose.getRotation().getRadians());
+         Pose2d filteredPose = new Pose2d(xPose,yPose,new Rotation2d(rotPose));
+         consumer.accept(
+             filteredPose,
+             observation.timestamp(),
+             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+       }
+    
 
       // Log camera metadata
       Logger.recordOutput(
@@ -153,6 +189,11 @@ public class Vision extends SubsystemBase {
       Logger.recordOutput(
           "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
           robotPosesRejected.toArray(new Pose3d[0]));
+      Logger.recordOutput(
+          "Vision/Camera" + Integer.toString(cameraIndex) + "/ExternalAngle",
+          inputs[cameraIndex].externalAngle);
+
+
       allTagPoses.addAll(tagPoses);
       allRobotPoses.addAll(robotPoses);
       allRobotPosesAccepted.addAll(robotPosesAccepted);
@@ -175,4 +216,10 @@ public class Vision extends SubsystemBase {
         double timestampSeconds,
         Matrix<N3, N1> visionMeasurementStdDevs);
   }
+
+  public Rotation2d getShooterTx(){
+    return inputs[0].latestTargetObservation.tx();
+  }
+
+
 }

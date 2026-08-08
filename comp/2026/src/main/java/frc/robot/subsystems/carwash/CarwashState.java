@@ -13,27 +13,25 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.carwashConstants;
 import frc.robot.Constants.intakeConstants;
 
-//TODO: fix tabbing/spacing
-public class CarwashState extends SubsystemBase{
+public class CarwashState extends SubsystemBase {
     private TalonFX carwash;
 
     public CarwashState() {
         configureCarwash();
     }
-    
+
     private final VelocityVoltage carwashPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
 
-    
     public enum CarwashStates {
-        Idle, 
-        //forward is into shooter and reverse is into hopper
+        Idle,
+        // forward is into shooter and reverse is into hopper
         Foward,
         Reverse,
-}
+    }
 
-private CarwashStates CurrentState = CarwashStates.Idle;
+    private CarwashStates CurrentState = CarwashStates.Idle;
 
-    public void configureCarwash(){
+    public void configureCarwash() {
         carwash = new TalonFX(carwashConstants.CARWASH_WASHER_MOTOR_ID, new CANBus("rio"));
         var carwashConfigure = new TalonFXConfiguration();
         carwashConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
@@ -46,45 +44,45 @@ private CarwashStates CurrentState = CarwashStates.Idle;
         carwashConfigure.Slot0.kI = 0;
         carwashConfigure.Slot0.kD = 0;
         carwash.getConfigurator().apply(carwashConfigure);
-}
-
-public void setCarwashForwardVelocity(double velocity) {
-    carwash.setControl(carwashPIDRequest.withVelocity(velocity));
-}
-
-public void setCarwashStop(){
-    carwash.stopMotor();
-}
-
-public void setCarwashReverseVelocity(double velocity) {
-    carwash.setControl(carwashPIDRequest.withVelocity(-velocity));
-}
-
-public StatusSignal<AngularVelocity> getCarwashVelocity(){
-    return carwash.getVelocity();
-}
-
-public void setCurrentState(CarwashStates state){
-    CurrentState = state;
-}
-
-@Override
-public void periodic(){
-    switch (CurrentState) {
-        case Idle:
-            this.setCarwashStop();
-            
-        break;
-
-        case Foward:
-            this.setCarwashForwardVelocity(carwashConstants.CARWASH_SPIN_VELOCITY);
-
-        break;
-
-        case Reverse:
-            this.setCarwashReverseVelocity(carwashConstants.CARWASH_SPIN_REVERSE_VELOCITY);
-
-        break;
     }
-}
+
+    public void setCarwashForwardVelocity(double velocity) {
+        carwash.setControl(carwashPIDRequest.withVelocity(velocity));
+    }
+
+    public void setCarwashStop() {
+        carwash.stopMotor();
+    }
+
+    public void setCarwashReverseVelocity(double velocity) {
+        carwash.setControl(carwashPIDRequest.withVelocity(-velocity));
+    }
+
+    public StatusSignal<AngularVelocity> getCarwashVelocity() {
+        return carwash.getVelocity();
+    }
+
+    public void setCurrentState(CarwashStates state) {
+        CurrentState = state;
+    }
+
+    @Override
+    public void periodic() {
+        switch (CurrentState) {
+            case Idle:
+                this.setCarwashStop();
+
+                break;
+
+            case Foward:
+                this.setCarwashForwardVelocity(carwashConstants.CARWASH_SPIN_VELOCITY);
+
+                break;
+
+            case Reverse:
+                this.setCarwashReverseVelocity(carwashConstants.CARWASH_SPIN_REVERSE_VELOCITY);
+
+                break;
+        }
+    }
 }

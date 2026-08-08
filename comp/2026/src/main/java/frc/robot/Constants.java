@@ -57,7 +57,7 @@ public final class Constants {
 
     public static final double[] PASSING_SPEEDS = {};
 
-    public static final double SHOOTING_TEST_SPEEDS = 40;
+    public static final double SHOOTING_TEST_SPEEDS = 38;
 
     public static final double SHOOTING_SPINUP = 1;
     public static final double PASSING_SPINUP = 0.75;

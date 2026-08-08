@@ -7,21 +7,34 @@
 
 package frc.robot.subsystems.vision;
 
+import java.util.List;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 
 public class VisionConstants {
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
-  // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "intake";
-  public static String camera1Name = "shooter";
-  public static String camera2Name = "fright";
-  public static String camera3Name = "fleft";
+
+  // Limelight constants are configured here and the name should be accessed from here
+  // when constructor for the limelightConstants runs it will upload the offsets to the limelight
+  // Camera data, names must match names configured on coprocessor
+  // side is right-positive
+  public static limelightConstants[] cameraConstants = {
+    new limelightConstants("limelight-shooter", 0.423418, 0.0, 0.310388, 0.0, 27, 0.0), 
+    //new limelightConstants("limelight-intake", 0.08586724, 0.0, 0.53385466, 0.0, 23, 180),
+    new limelightConstants("limelight-intake", -0.434, Units.inchesToMeters(-9.825), Units.inchesToMeters(19.03), 0.0, 26, 180), //update needed
+    new limelightConstants("limelight-fleft", 0.26162,-0.313182,0.165608, 0.0, 27, 90),
+    new limelightConstants("limelight-fright",  0.26162, 0.313182,0.165608, 0.0, 27, -90)
+
+};
+
+public static List<Integer> IgnoreTags = List.of(28, 29,30,31, 32,23);
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
@@ -33,22 +46,27 @@ public class VisionConstants {
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
   public static double maxZError = 0.75;
-
+  
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.02; // Meters
-  public static double angularStdDevBaseline = 0.06; // Radians
+  public static double linearStdDevBaseline = 0.05; // Meters originally  0.02
+  public static double angularStdDevBaseline = 0.01; // Radians originally 0.06
 
   // Standard deviation multipliers for each camera
   // (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
         1.0, // Camera 0
-        1.0 // Camera 1
+        1.0, // Camera 1
+        1.0,
+        1.0
       };
 
   // Multipliers to apply for MegaTag 2 observations
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
   public static double angularStdDevMegatag2Factor =
       Double.POSITIVE_INFINITY; // No rotation data available
+
+  public static double linearStdDevMegatag2Base = 0.1;
+  public static double angularStdDevMegatag2Base = Double.POSITIVE_INFINITY;
 }

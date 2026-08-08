@@ -14,31 +14,30 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.shooterConstants;
 
-//TODO: fix tabbing/spacing
-    public class ShooterState extends SubsystemBase{
-        //motors listed as viewed from back of the robot
-        private TalonFX topRightShooter;
-        private TalonFX topLeftShooter;
-        private TalonFX bottomRightShooter;
-        private TalonFX bottomLeftShooter;
+public class ShooterState extends SubsystemBase {
+    // motors listed as viewed from back of the robot
+    private TalonFX topRightShooter;
+    private TalonFX topLeftShooter;
+    private TalonFX bottomRightShooter;
+    private TalonFX bottomLeftShooter;
 
-        public ShooterState() {
-            configureTopRightShooter();
-        }   
+    public ShooterState() {
+        configureTopRightShooter();
+    }
 
-        private final VelocityVoltage shooterMotorPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
-        private double velocity;
+    private final VelocityVoltage shooterMotorPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
+    private double velocity;
 
     public enum ShooterStates {
-        Idle, 
-        Shoot, 
+        Idle,
+        Shoot,
         Reverse,
         Pass
-}
+    }
 
     private ShooterStates CurrentState = ShooterStates.Idle;
 
-    public void configureTopRightShooter(){
+    public void configureTopRightShooter() {
         topRightShooter = new TalonFX(shooterConstants.TOPRIGHT_SHOOTER_MOTOR_ID, new CANBus("rio"));
         bottomRightShooter = new TalonFX(shooterConstants.BOTTOMRIGHT_SHOOTER_MOTOR_ID, new CANBus("rio"));
         topLeftShooter = new TalonFX(shooterConstants.TOPLEFT_SHOOTER_MOTOR_ID, new CANBus("rio"));
@@ -55,60 +54,63 @@ import frc.robot.Constants.shooterConstants;
         shooterConfigure.Slot0.kD = 0;
         topRightShooter.getConfigurator().apply(shooterConfigure);
 
-        bottomRightShooter.setControl(new Follower(shooterConstants.TOPRIGHT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Aligned));
-        topLeftShooter.setControl(new Follower(shooterConstants.TOPRIGHT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Opposed));
-        bottomLeftShooter.setControl(new Follower(shooterConstants.TOPRIGHT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Opposed));
-}
+        bottomRightShooter
+                .setControl(new Follower(shooterConstants.TOPRIGHT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Aligned));
+        topLeftShooter
+                .setControl(new Follower(shooterConstants.TOPRIGHT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Opposed));
+        bottomLeftShooter
+                .setControl(new Follower(shooterConstants.TOPRIGHT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Opposed));
+    }
 
     public void setTopRightShooterVelocity(double velocity) {
         topRightShooter.setControl(shooterMotorPIDRequest.withVelocity(velocity));
-}
+    }
 
     public void setTopRightShooterUnjamVelocity(double velocity) {
         topRightShooter.setControl(shooterMotorPIDRequest.withVelocity(-velocity));
-}
+    }
 
-    public void stopStopRightShooter(){
+    public void stopStopRightShooter() {
         topRightShooter.stopMotor();
-}
+    }
 
-    public StatusSignal<AngularVelocity> getTopRightShooterVelocity(){
+    public StatusSignal<AngularVelocity> getTopRightShooterVelocity() {
         return topLeftShooter.getVelocity();
-}
+    }
 
-    public StatusSignal<AngularVelocity> getTopLeftShooterVelocity(){
+    public StatusSignal<AngularVelocity> getTopLeftShooterVelocity() {
         return topRightShooter.getVelocity();
-}
+    }
 
-    public StatusSignal<AngularVelocity> getBottomRightShooterVelocity(){
+    public StatusSignal<AngularVelocity> getBottomRightShooterVelocity() {
         return bottomRightShooter.getVelocity();
-}
+    }
 
-    public StatusSignal<AngularVelocity> getBottomLeftShooterVelocity(){
+    public StatusSignal<AngularVelocity> getBottomLeftShooterVelocity() {
         return bottomLeftShooter.getVelocity();
     }
 
-    public void setCurrentState(ShooterStates state){
+    public void setCurrentState(ShooterStates state) {
         CurrentState = state;
     }
 
-@Override
-    public void periodic(){
+    @Override
+    public void periodic() {
         switch (CurrentState) {
             case Idle:
-            topRightShooter.stopMotor();
-                
-            break;
+                topRightShooter.stopMotor();
+
+                break;
 
             case Shoot:
                 this.setTopRightShooterVelocity(shooterConstants.SHOOTING_TEST_SPEEDS);
 
-            break;
+                break;
 
             case Pass:
                 this.setTopRightShooterVelocity(velocity);
 
-            break;
+                break;
 
             case Reverse:
                 this.setTopRightShooterUnjamVelocity(velocity);
