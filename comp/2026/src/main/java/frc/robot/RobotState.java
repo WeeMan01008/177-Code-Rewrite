@@ -166,7 +166,7 @@ public class RobotState extends SubsystemBase {
 
             case Shoot:
                 shooterState.setCurrentState(ShooterStates.Shoot);
-                intakeState.setCurrentState(IntakeStates.Idle);
+                intakeState.setCurrentState(IntakeStates.Intake);
                 hotdogState.setCurrentState(HotdogStates.Forward);
                 // hoodState.setCurrentState(HoodStates.PositionShoot);
                 carwashState.setCurrentState(CarwashStates.Foward);
@@ -186,7 +186,7 @@ public class RobotState extends SubsystemBase {
                 shooterState.setCurrentState(ShooterStates.Shoot);
                 intakeState.setCurrentState(IntakeStates.Intake);
                 hotdogState.setCurrentState(HotdogStates.Reverse);
-                hoodState.setCurrentState(HoodStates.Idle);
+                // hoodState.setCurrentState(HoodStates.PositionShoot);
                 carwashState.setCurrentState(CarwashStates.Reverse);
 
                 break;
@@ -196,7 +196,7 @@ public class RobotState extends SubsystemBase {
                 intakeState.setCurrentState(IntakeStates.Intake);
                 hotdogState.setCurrentState(HotdogStates.Forward);
                 hoodState.setCurrentState(HoodStates.Idle);
-                carwashState.setCurrentState(CarwashStates.Idle);
+                carwashState.setCurrentState(CarwashStates.Reverse);
 
                 break;
 
@@ -205,7 +205,7 @@ public class RobotState extends SubsystemBase {
                 intakeState.setCurrentState(IntakeStates.Outtake);
                 hotdogState.setCurrentState(HotdogStates.Reverse);
                 hoodState.setCurrentState(HoodStates.Idle);
-                carwashState.setCurrentState(CarwashStates.Reverse);
+                carwashState.setCurrentState(CarwashStates.Outtake);
 
                 break;
 
@@ -267,6 +267,7 @@ public class RobotState extends SubsystemBase {
                 .getMyPassingCoordinates(alliance,
                         drive)
                 .toPose2d().getTranslation());
+        Logger.recordOutput("Hood_Position", hoodState.getHoodPosition().getValueAsDouble());
     }
 
 }

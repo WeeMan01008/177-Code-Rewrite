@@ -64,11 +64,11 @@ public class IntakeState extends SubsystemBase {
         intakeRollersConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
         intakeRollersConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         intakeRollersConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        intakeRollersConfigure.Slot0.kS = 0;
-        intakeRollersConfigure.Slot0.kV = 0.11;
-        intakeRollersConfigure.Slot0.kP = 1;
+        intakeRollersConfigure.Slot0.kS = 0.241;
+        intakeRollersConfigure.Slot0.kV = 0.126;
+        intakeRollersConfigure.Slot0.kP = 1.589;
         intakeRollersConfigure.Slot0.kI = 0;
-        intakeRollersConfigure.Slot0.kD = 0;
+        intakeRollersConfigure.Slot0.kD = -0.002;
         rightIntakeRoller.getConfigurator().apply(intakeRollersConfigure);
 
         leftIntakeRoller

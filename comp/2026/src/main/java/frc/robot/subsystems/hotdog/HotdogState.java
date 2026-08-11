@@ -40,11 +40,11 @@ public class HotdogState extends SubsystemBase {
         hotdogConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
         hotdogConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         hotdogConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        hotdogConfigure.Slot0.kS = 0;
-        hotdogConfigure.Slot0.kV = 0;
-        hotdogConfigure.Slot0.kP = 1;
+        hotdogConfigure.Slot0.kS = 0.359;
+        hotdogConfigure.Slot0.kV = 0.114;
+        hotdogConfigure.Slot0.kP = 1.758;
         hotdogConfigure.Slot0.kI = 0;
-        hotdogConfigure.Slot0.kD = 0;
+        hotdogConfigure.Slot0.kD = -0.002;
         hotdog.getConfigurator().apply(hotdogConfigure);
     }
 
@@ -77,12 +77,12 @@ public class HotdogState extends SubsystemBase {
                 break;
 
             case Forward:
-                this.setHotdogVelocity(hotdogConstants.TEST_VELOCITY);
+                this.setHotdogVelocity(hotdogConstants.INTAKE_VELOCITY);
 
                 break;
 
             case Reverse:
-                this.setHotdogReverseVelocity(hotdogConstants.TEST_VELOCITY);
+                this.setHotdogReverseVelocity(hotdogConstants.OUTTAKE_VELOCITY);
 
                 break;
         }

@@ -27,6 +27,7 @@ public class CarwashState extends SubsystemBase {
         // forward is into shooter and reverse is into hopper
         Foward,
         Reverse,
+        Outtake
     }
 
     private CarwashStates CurrentState = CarwashStates.Idle;
@@ -38,11 +39,11 @@ public class CarwashState extends SubsystemBase {
         carwashConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
         carwashConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         carwashConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        carwashConfigure.Slot0.kS = 0;
-        carwashConfigure.Slot0.kV = 0.11;
-        carwashConfigure.Slot0.kP = 1;
+        carwashConfigure.Slot0.kS = 0.340;
+        carwashConfigure.Slot0.kV = 0.123;
+        carwashConfigure.Slot0.kP = 1.632;
         carwashConfigure.Slot0.kI = 0;
-        carwashConfigure.Slot0.kD = 0;
+        carwashConfigure.Slot0.kD = -0.002;
         carwash.getConfigurator().apply(carwashConfigure);
     }
 
@@ -83,6 +84,9 @@ public class CarwashState extends SubsystemBase {
                 this.setCarwashReverseVelocity(carwashConstants.CARWASH_SPIN_REVERSE_VELOCITY);
 
                 break;
+
+            case Outtake:
+                this.setCarwashReverseVelocity(carwashConstants.CARWASH_OUTTAKE_VELOCITY);
         }
     }
 }

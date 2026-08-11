@@ -47,11 +47,11 @@ public class ShooterState extends SubsystemBase {
         shooterConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
         shooterConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         shooterConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        shooterConfigure.Slot0.kS = 0;
-        shooterConfigure.Slot0.kV = 0;
-        shooterConfigure.Slot0.kP = 1;
+        shooterConfigure.Slot0.kS = 0.273;
+        shooterConfigure.Slot0.kV = 0.120;
+        shooterConfigure.Slot0.kP = 1.664;
         shooterConfigure.Slot0.kI = 0;
-        shooterConfigure.Slot0.kD = 0;
+        shooterConfigure.Slot0.kD = -0.002;
         topRightShooter.getConfigurator().apply(shooterConfigure);
 
         bottomRightShooter
