@@ -1,10 +1,11 @@
 package frc.robot.subsystems.hood;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -13,7 +14,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.hoodConstants;
-import frc.robot.Constants.intakeConstants;
 
 public class HoodState extends SubsystemBase {
     private TalonFX hood;
@@ -22,7 +22,7 @@ public class HoodState extends SubsystemBase {
         configureHood();
     }
 
-    private final MotionMagicExpoVoltage hoodPositionRequest = new MotionMagicExpoVoltage(0);
+    private final PositionVoltage hoodPositionRequest = new PositionVoltage(0);
 
     public enum HoodStates {
         Idle,
@@ -30,13 +30,15 @@ public class HoodState extends SubsystemBase {
         PositionPass
     }
 
-    private HoodStates CurrentState = HoodStates.Idle;
+    public HoodStates CurrentState = HoodStates.Idle;
 
     public void configureHood() {
         var hoodConfigure = new TalonFXConfiguration();
         hood = new TalonFX(hoodConstants.HOOD_MOTOR_ID, new CANBus("rio"));
-        hoodConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
+        hoodConfigure.CurrentLimits.StatorCurrentLimit = hoodConstants.statorCurrentLimit;
         hoodConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
+        hoodConfigure.CurrentLimits.SupplyCurrentLimit = hoodConstants.supplyCurrentLimit;
+        hoodConfigure.CurrentLimits.SupplyCurrentLimitEnable = true;
         hoodConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         hoodConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         hoodConfigure.Slot0.kS = 0.25;
@@ -45,20 +47,23 @@ public class HoodState extends SubsystemBase {
         hoodConfigure.Slot0.kI = 0;
         hoodConfigure.Slot0.kD = 0;
 
-        hoodConfigure.MotionMagic.MotionMagicCruiseVelocity = 0;
+        hoodConfigure.MotionMagic.MotionMagicCruiseVelocity = 30;
         hoodConfigure.MotionMagic.MotionMagicAcceleration = 700;
+        hoodConfigure.MotionMagic.MotionMagicJerk = 0;
         hoodConfigure.MotionMagic.MotionMagicExpo_kA = 0.01;
         hoodConfigure.MotionMagic.MotionMagicExpo_kV = 0.4;
 
         hood.getConfigurator().apply(hoodConfigure);
+
     }
 
     public void setHoodStop() {
+        hood.setControl(hoodPositionRequest.withPosition(0));
         hood.stopMotor();
     }
 
     public void setHoodPosition(double angle) {
-        hood.setControl(hoodPositionRequest.withPosition(angle));
+        hood.setControl(hoodPositionRequest.withPosition(angle).withVelocity(50));
     }
 
     public StatusSignal<Angle> getHoodPosition() {
@@ -79,11 +84,13 @@ public class HoodState extends SubsystemBase {
 
             case PositionShoot:
                 this.setHoodPosition(hoodConstants.HOOD_TEST_POSITION);
+                Logger.recordOutput("Hood_Set_Position", hoodConstants.HOOD_TEST_POSITION);
 
                 break;
 
             case PositionPass:
                 this.setHoodPosition(hoodConstants.HOOD_TEST_POSITION);
+                Logger.recordOutput("Hood_Set_Position", hoodConstants.HOOD_TEST_POSITION);
 
                 break;
         }

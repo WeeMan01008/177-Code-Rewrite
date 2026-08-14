@@ -64,9 +64,7 @@ public class RobotState extends SubsystemBase {
         Outtake,
         Unjam,
         IntakeStored,
-        IntakeDeployed,
-        AlignToPass,
-        AlignToHub
+        IntakeDeployed
     }
 
     private RobotStates CurrentState = RobotStates.Idle;
@@ -79,8 +77,13 @@ public class RobotState extends SubsystemBase {
         return alliance;
     }
 
+    public double getShooterVelocity() {
+        return shooterState.getTopRightShooterVelocity().getValueAsDouble();
+    }
+
     public void setCurrentState(RobotStates state) {
         CurrentState = state;
+        Logger.recordOutput("State", CurrentState);
     }
 
     public void setDistanceToHub(double distance) {
@@ -98,7 +101,7 @@ public class RobotState extends SubsystemBase {
 
     public Command setStateIdle() {
         return Commands.runOnce(() -> setCurrentState(RobotStates.Idle),
-                shooterState, intakeState, hotdogState, hoodState, carwashState);
+                shooterState, intakeState, hotdogState, carwashState);
     }
 
     public Command setStateShoot() {
@@ -112,7 +115,7 @@ public class RobotState extends SubsystemBase {
     }
 
     public Command setStateSpinUp() {
-        return Commands.run(() -> setCurrentState(RobotStates.SpinUp),
+        return Commands.runOnce(() -> setCurrentState(RobotStates.SpinUp),
                 shooterState, intakeState, hotdogState, hoodState, carwashState);
     }
 
@@ -141,19 +144,8 @@ public class RobotState extends SubsystemBase {
                 shooterState, intakeState, hotdogState, hoodState, carwashState);
     }
 
-    public Command setStateAlignToPass() {
-        return Commands.runOnce(() -> setCurrentState(RobotStates.AlignToPass),
-                shooterState, intakeState, hotdogState, hoodState, carwashState);
-    }
-
-    public Command setStateAlignToHub() {
-        return Commands.runOnce(() -> setCurrentState(RobotStates.AlignToHub),
-                shooterState, intakeState, hotdogState, hoodState, carwashState);
-    }
-
     @Override
     public void periodic() {
-        logStateInformation();
         switch (CurrentState) {
             case Idle:
                 shooterState.setCurrentState(ShooterStates.Idle);
@@ -165,11 +157,11 @@ public class RobotState extends SubsystemBase {
                 break;
 
             case Shoot:
-                shooterState.setCurrentState(ShooterStates.Shoot);
-                intakeState.setCurrentState(IntakeStates.Intake);
-                hotdogState.setCurrentState(HotdogStates.Forward);
-                // hoodState.setCurrentState(HoodStates.PositionShoot);
-                carwashState.setCurrentState(CarwashStates.Foward);
+                // shooterState.setCurrentState(ShooterStates.Shoot);
+                // intakeState.setCurrentState(IntakeStates.Intake);
+                // hotdogState.setCurrentState(HotdogStates.Forward);
+                hoodState.setCurrentState(HoodStates.PositionShoot);
+                // carwashState.setCurrentState(CarwashStates.Foward);
 
                 break;
 
@@ -183,11 +175,11 @@ public class RobotState extends SubsystemBase {
                 break;
 
             case SpinUp:
-                shooterState.setCurrentState(ShooterStates.Shoot);
-                intakeState.setCurrentState(IntakeStates.Intake);
-                hotdogState.setCurrentState(HotdogStates.Reverse);
-                // hoodState.setCurrentState(HoodStates.PositionShoot);
-                carwashState.setCurrentState(CarwashStates.Reverse);
+                // shooterState.setCurrentState(ShooterStates.Shoot);
+                // intakeState.setCurrentState(IntakeStates.Intake);
+                // hotdogState.setCurrentState(HotdogStates.Reverse);
+                // hoodState.setCurrentState(HoodStates.Idle);
+                // carwashState.setCurrentState(CarwashStates.Reverse);
 
                 break;
 
@@ -235,25 +227,9 @@ public class RobotState extends SubsystemBase {
                 carwashState.setCurrentState(CarwashStates.Idle);
 
                 break;
-
-            case AlignToHub:
-                shooterState.setCurrentState(ShooterStates.Idle);
-                intakeState.setCurrentState(IntakeStates.Idle);
-                hotdogState.setCurrentState(HotdogStates.Idle);
-                hoodState.setCurrentState(HoodStates.Idle);
-                carwashState.setCurrentState(CarwashStates.Idle);
-
-                break;
-
-            case AlignToPass:
-                shooterState.setCurrentState(ShooterStates.Idle);
-                intakeState.setCurrentState(IntakeStates.Idle);
-                hotdogState.setCurrentState(HotdogStates.Idle);
-                hoodState.setCurrentState(HoodStates.Idle);
-                carwashState.setCurrentState(CarwashStates.Idle);
-
-                break;
         }
+
+        logStateInformation();
     }
 
     public void logStateInformation() {
@@ -268,6 +244,7 @@ public class RobotState extends SubsystemBase {
                         drive)
                 .toPose2d().getTranslation());
         Logger.recordOutput("Hood_Position", hoodState.getHoodPosition().getValueAsDouble());
+        Logger.recordOutput("Hood_State", hoodState.CurrentState);
     }
 
 }

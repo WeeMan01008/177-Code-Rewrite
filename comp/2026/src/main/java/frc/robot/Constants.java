@@ -40,11 +40,16 @@ public final class Constants {
     public static final double[] HOOD_POSITION_SHOOTING = {};
     public static final double[] HOOD_POSITION_PASSING = {};
 
-    public static final double HOOD_TEST_POSITION = -2;
+    public static final double HOOD_TEST_POSITION = -6;
 
     public static final double HOOD_DOWN = -0.272;
 
     public static final double HOOD_UP = -6.488;
+
+    public static final double statorCurrentLimit = 80;
+    public static final double supplyCurrentLimit = 80;
+    public static final double forwardSoftwareLimit = -6.2;
+    public static final double reverseSoftwareLimit = 0;
   }
 
   public static class shooterConstants {
