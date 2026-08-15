@@ -205,7 +205,8 @@ public class RobotContainer {
                         .andThen(robotState.setStateShoot()))
                 .onFalse(robotState.setStateIdle());
 
-        driverController.y().whileTrue(robotState.setStateShoot());
+        driverController.y().whileTrue(robotState.setStateShoot())
+                .onFalse(robotState.setStateIdle());
 
         driverController.leftBumper()
                 .whileTrue(robotState.setStateIntake())

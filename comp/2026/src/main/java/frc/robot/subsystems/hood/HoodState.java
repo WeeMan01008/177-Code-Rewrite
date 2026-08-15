@@ -29,7 +29,7 @@ public class HoodState extends SubsystemBase {
         PositionPass
     }
 
-    public HoodStates CurrentState = HoodStates.Idle;
+    private HoodStates CurrentState = HoodStates.PositionShoot;
 
     public void configureHood() {
         var hoodConfigure = new TalonFXConfiguration();
@@ -57,12 +57,16 @@ public class HoodState extends SubsystemBase {
     }
 
     public void setHoodStop() {
-        hood.setControl(hoodPositionRequest.withPosition(0));
-        hood.stopMotor();
+        setHoodPosition(0);
+        // hood.stopMotor();
     }
 
     public void setHoodPosition(double angle) {
         hood.setControl(hoodPositionRequest.withPosition(angle));
+    }
+
+    public void resetHoodZeroPosition() {
+        hood.setPosition(0);
     }
 
     public StatusSignal<Angle> getHoodPosition() {

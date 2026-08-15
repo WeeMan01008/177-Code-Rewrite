@@ -19,97 +19,97 @@ import edu.wpi.first.wpilibj.RobotBase;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode simMode = Mode.SIM;
-  public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+    public static final Mode simMode = Mode.SIM;
+    public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
-  public static enum Mode {
-    /** Running on a real robot. */
-    REAL,
+    public static enum Mode {
+        /** Running on a real robot. */
+        REAL,
 
-    /** Running a physics simulator. */
-    SIM,
+        /** Running a physics simulator. */
+        SIM,
 
-    /** Replaying from a log file. */
-    REPLAY
-  }
+        /** Replaying from a log file. */
+        REPLAY
+    }
 
-  public static class hoodConstants {
-    // Constant for hood motor ID
-    public static final int HOOD_MOTOR_ID = 21;
+    public static class hoodConstants {
+        // Constant for hood motor ID
+        public static final int HOOD_MOTOR_ID = 21;
 
-    public static final double[] HOOD_POSITION_SHOOTING = {};
-    public static final double[] HOOD_POSITION_PASSING = {};
+        public static final double[] HOOD_POSITION_SHOOTING = {};
+        public static final double[] HOOD_POSITION_PASSING = {};
 
-    public static final double HOOD_TEST_POSITION = -6;
+        public static final double HOOD_TEST_POSITION = -5.5;
 
-    public static final double HOOD_DOWN = -0.272;
+        public static final double HOOD_DOWN = -0.272;
 
-    public static final double HOOD_UP = -6.488;
+        public static final double HOOD_UP = -6.488;
 
-    public static final double statorCurrentLimit = 80;
-    public static final double supplyCurrentLimit = 80;
-    public static final double forwardSoftwareLimit = -6.2;
-    public static final double reverseSoftwareLimit = 0;
-  }
+        public static final double statorCurrentLimit = 80;
+        public static final double supplyCurrentLimit = 80;
+        public static final double forwardSoftwareLimit = -6.2;
+        public static final double reverseSoftwareLimit = 0;
+    }
 
-  public static class shooterConstants {
-    // Constants for drum shooter motor ID's, listed by view from behind robot
-    public static final int TOPLEFT_SHOOTER_MOTOR_ID = 13;
-    public static final int BOTTOMLEFT_SHOOTER_MOTOR_ID = 20;
+    public static class shooterConstants {
+        // Constants for drum shooter motor ID's, listed by view from behind robot
+        public static final int TOPLEFT_SHOOTER_MOTOR_ID = 13;
+        public static final int BOTTOMLEFT_SHOOTER_MOTOR_ID = 20;
 
-    public static final int TOPRIGHT_SHOOTER_MOTOR_ID = 11;
-    public static final int BOTTOMRIGHT_SHOOTER_MOTOR_ID = 14;
+        public static final int TOPRIGHT_SHOOTER_MOTOR_ID = 11;
+        public static final int BOTTOMRIGHT_SHOOTER_MOTOR_ID = 14;
 
-    public static final int STATOR_CURRENT_LIMIT = 70;
+        public static final int STATOR_CURRENT_LIMIT = 70;
 
-    public static final double[] SHOOTING_DISTANCES = {};
+        public static final double[] SHOOTING_DISTANCES = {};
 
-    public static final double[] SHOOTER_SPEEDS = {};
+        public static final double[] SHOOTER_SPEEDS = {};
 
-    public static final double[] PASSING_DISTANCES = {};
+        public static final double[] PASSING_DISTANCES = {};
 
-    public static final double[] PASSING_SPEEDS = {};
+        public static final double[] PASSING_SPEEDS = {};
 
-    public static final double SHOOTING_TEST_SPEEDS = 35;
+        public static final double SHOOTING_TEST_SPEEDS = 35;
 
-    public static final double SHOOTING_SPINUP = 1;
-    public static final double PASSING_SPINUP = 0.75;
+        public static final double SHOOTING_SPINUP = 1;
+        public static final double PASSING_SPINUP = 0.75;
 
-    public static final double SHOOTING_OFFSET = 23.5 + 0; // 23.5 is half of hub and ___ is half of robot
+        public static final double SHOOTING_OFFSET = 23.5 + 0; // 23.5 is half of hub and ___ is half of robot
 
-  }
+    }
 
-  public static class intakeConstants {
-    // Constants for intake motor ID's
-    public static final int INTAKE_DEPLOY_MOTOR_ID = 10;
-    public static final int INTAKE_ROLLERLEFT_MOTOR_ID = 18;
-    public static final int INTAKE_ROLLERRIGHT_MOTOR_ID = 19;
+    public static class intakeConstants {
+        // Constants for intake motor ID's
+        public static final int INTAKE_DEPLOY_MOTOR_ID = 10;
+        public static final int INTAKE_ROLLERLEFT_MOTOR_ID = 18;
+        public static final int INTAKE_ROLLERRIGHT_MOTOR_ID = 19;
 
-    public static final int STATOR_CURRENT_LIMIT = 70;
+        public static final int STATOR_CURRENT_LIMIT = 70;
 
-    public static final double INTAKE_VELOCITY = 70;
-    public static final double OUTTAKE_VELOCITY = 70;
+        public static final double INTAKE_VELOCITY = 70;
+        public static final double OUTTAKE_VELOCITY = 70;
 
-    public static final double INTAKE_DEPLOYED_POSITION = 11;
-    public static final double INTAKE_STORED_POSITION = -0.15;
+        public static final double INTAKE_DEPLOYED_POSITION = 11;
+        public static final double INTAKE_STORED_POSITION = -0.15;
 
-  }
+    }
 
-  public static class hotdogConstants {
-    // Constant for hotdog motor ID
-    public static final int HOTDOG_MOTOR_ID = 16;
+    public static class hotdogConstants {
+        // Constant for hotdog motor ID
+        public static final int HOTDOG_MOTOR_ID = 16;
 
-    public static final double INTAKE_VELOCITY = 30;
-    public static final double OUTTAKE_VELOCITY = 60;
+        public static final double INTAKE_VELOCITY = 30;
+        public static final double OUTTAKE_VELOCITY = 60;
 
-  }
+    }
 
-  public static class carwashConstants {
-    // Constants for carwash motor ID's
-    public static final int CARWASH_WASHER_MOTOR_ID = 15;
+    public static class carwashConstants {
+        // Constants for carwash motor ID's
+        public static final int CARWASH_WASHER_MOTOR_ID = 15;
 
-    public static final double CARWASH_SPIN_VELOCITY = 35;
-    public static final double CARWASH_SPIN_REVERSE_VELOCITY = 25;
-    public static final double CARWASH_OUTTAKE_VELOCITY = 35;
-  }
+        public static final double CARWASH_SPIN_VELOCITY = 35;
+        public static final double CARWASH_SPIN_REVERSE_VELOCITY = 25;
+        public static final double CARWASH_OUTTAKE_VELOCITY = 35;
+    }
 }
