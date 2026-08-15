@@ -178,7 +178,7 @@ public class RobotState extends SubsystemBase {
                 // shooterState.setCurrentState(ShooterStates.Shoot);
                 // intakeState.setCurrentState(IntakeStates.Intake);
                 // hotdogState.setCurrentState(HotdogStates.Reverse);
-                // hoodState.setCurrentState(HoodStates.Idle);
+                hoodState.setCurrentState(HoodStates.PositionShoot);
                 // carwashState.setCurrentState(CarwashStates.Reverse);
 
                 break;

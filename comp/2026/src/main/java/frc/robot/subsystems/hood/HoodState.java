@@ -6,7 +6,6 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -22,7 +21,7 @@ public class HoodState extends SubsystemBase {
         configureHood();
     }
 
-    private final PositionVoltage hoodPositionRequest = new PositionVoltage(0);
+    private final MotionMagicExpoVoltage hoodPositionRequest = new MotionMagicExpoVoltage(0);
 
     public enum HoodStates {
         Idle,
@@ -39,7 +38,7 @@ public class HoodState extends SubsystemBase {
         hoodConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
         hoodConfigure.CurrentLimits.SupplyCurrentLimit = hoodConstants.supplyCurrentLimit;
         hoodConfigure.CurrentLimits.SupplyCurrentLimitEnable = true;
-        hoodConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        hoodConfigure.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         hoodConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         hoodConfigure.Slot0.kS = 0.25;
         hoodConfigure.Slot0.kV = 0.2;
@@ -63,7 +62,7 @@ public class HoodState extends SubsystemBase {
     }
 
     public void setHoodPosition(double angle) {
-        hood.setControl(hoodPositionRequest.withPosition(angle).withVelocity(50));
+        hood.setControl(hoodPositionRequest.withPosition(angle));
     }
 
     public StatusSignal<Angle> getHoodPosition() {
