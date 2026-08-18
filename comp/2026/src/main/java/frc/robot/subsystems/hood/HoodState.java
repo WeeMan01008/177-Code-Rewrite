@@ -1,7 +1,5 @@
 package frc.robot.subsystems.hood;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -16,6 +14,8 @@ import frc.robot.Constants.hoodConstants;
 
 public class HoodState extends SubsystemBase {
     private TalonFX hood;
+    private double positionShoot;
+    private double positionPass;
 
     public HoodState() {
         configureHood();
@@ -25,6 +25,7 @@ public class HoodState extends SubsystemBase {
 
     public enum HoodStates {
         Idle,
+        PositionDefault,
         PositionShoot,
         PositionPass
     }
@@ -56,9 +57,20 @@ public class HoodState extends SubsystemBase {
 
     }
 
+    public double setShootingPosition(double angle) {
+        return positionShoot = angle;
+    }
+
+    public double setPassingPosition(double angle) {
+        return positionPass = angle;
+    }
+
     public void setHoodStop() {
+        hood.stopMotor();
+    }
+
+    public void setHoodAngleDefault() {
         setHoodPosition(0);
-        // hood.stopMotor();
     }
 
     public void setHoodPosition(double angle) {
@@ -85,15 +97,18 @@ public class HoodState extends SubsystemBase {
 
                 break;
 
+            case PositionDefault:
+                this.setHoodAngleDefault();
+
+                break;
+
             case PositionShoot:
-                this.setHoodPosition(hoodConstants.HOOD_TEST_POSITION);
-                Logger.recordOutput("Hood_Set_Position", hoodConstants.HOOD_TEST_POSITION);
+                this.setHoodPosition(positionShoot);
 
                 break;
 
             case PositionPass:
-                this.setHoodPosition(hoodConstants.HOOD_TEST_POSITION);
-                Logger.recordOutput("Hood_Set_Position", hoodConstants.HOOD_TEST_POSITION);
+                this.setHoodPosition(positionPass);
 
                 break;
         }

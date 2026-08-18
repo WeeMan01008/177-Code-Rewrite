@@ -26,7 +26,8 @@ public class ShooterState extends SubsystemBase {
     }
 
     private final VelocityVoltage shooterMotorPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
-    private double velocity;
+    private double shootingVelocity;
+    private double passingVelocity;
 
     public enum ShooterStates {
         Idle,
@@ -60,6 +61,14 @@ public class ShooterState extends SubsystemBase {
                 .setControl(new Follower(shooterConstants.TOPRIGHT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Opposed));
         bottomLeftShooter
                 .setControl(new Follower(shooterConstants.TOPRIGHT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Opposed));
+    }
+
+    public double setShooterVelocity(double velocity) {
+        return shootingVelocity = velocity;
+    }
+
+    public double setPassingVelocity(double velocity) {
+        return passingVelocity = velocity;
     }
 
     public void setTopRightShooterVelocity(double velocity) {
@@ -103,17 +112,17 @@ public class ShooterState extends SubsystemBase {
                 break;
 
             case Shoot:
-                this.setTopRightShooterVelocity(shooterConstants.SHOOTING_TEST_SPEEDS);
+                this.setTopRightShooterVelocity(shootingVelocity);
 
                 break;
 
             case Pass:
-                this.setTopRightShooterVelocity(velocity);
+                this.setTopRightShooterVelocity(passingVelocity);
 
                 break;
 
             case Reverse:
-                this.setTopRightShooterUnjamVelocity(velocity);
+                this.setTopRightShooterUnjamVelocity(shooterConstants.UNJAM_VELOCITY);
         }
     }
 }

@@ -37,8 +37,9 @@ public final class Constants {
         // Constant for hood motor ID
         public static final int HOOD_MOTOR_ID = 21;
 
-        public static final double[] HOOD_POSITION_SHOOTING = {};
-        public static final double[] HOOD_POSITION_PASSING = {};
+        public static final double[] HOOD_POSITION_SHOOTING = { 0, 0, -0.5, -0.75, -1.0, -1.4, -1.6, -1.8, -2.0, -2.2,
+                -2.4 };
+        public static final double[] HOOD_POSITION_PASSING = { -3.0, -3.5, -4.0, -4.5, -5.0, -5.5, -6.0 };
 
         public static final double HOOD_TEST_POSITION = -5.5;
 
@@ -62,20 +63,22 @@ public final class Constants {
 
         public static final int STATOR_CURRENT_LIMIT = 70;
 
-        public static final double[] SHOOTING_DISTANCES = {};
+        public static final double[] SHOOTING_DISTANCES = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
 
-        public static final double[] SHOOTER_SPEEDS = {};
+        public static final double[] SHOOTER_SPEEDS = { 33.5, 33.5, 33.5, 33.5, 34.5, 36.25, 36.25, 37.5, 38, 38.5,
+                39 };
 
-        public static final double[] PASSING_DISTANCES = {};
+        public static final double[] PASSING_DISTANCES = { 0, 30, 40, 50, 60, 70, 80 };
 
-        public static final double[] PASSING_SPEEDS = {};
+        public static final double[] PASSING_SPEEDS = { 30, 31, 32, 33, 34, 35, 36 };
 
         public static final double SHOOTING_TEST_SPEEDS = 35;
+        public static final double UNJAM_VELOCITY = 30;
 
         public static final double SHOOTING_SPINUP = 1;
         public static final double PASSING_SPINUP = 0.75;
 
-        public static final double SHOOTING_OFFSET = 23.5 + 0; // 23.5 is half of hub and ___ is half of robot
+        public static final double SHOOTING_OFFSET = 23.5 + 21; // 23.5 is half of hub and ___ is half of robot
 
     }
 
@@ -91,7 +94,7 @@ public final class Constants {
         public static final double OUTTAKE_VELOCITY = 70;
 
         public static final double INTAKE_DEPLOYED_POSITION = 11;
-        public static final double INTAKE_STORED_POSITION = -0.15;
+        public static final double INTAKE_STORED_POSITION = 0;
 
     }
 

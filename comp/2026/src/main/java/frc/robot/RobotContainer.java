@@ -6,9 +6,7 @@ package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.cameraConstants;
 
-import frc.robot.Constants.hoodConstants;
 import frc.robot.Constants.shooterConstants;
-import frc.robot.RobotState.RobotStates;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -20,7 +18,6 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.util.AllianceFlipUtil;
-import frc.robot.subsystems.vision.VisionConstants;
 
 import org.bobcatrobotics.Commands.ActionFactory;
 //import frc.robot.util.AllianceFlipUtil;
@@ -29,15 +26,11 @@ import org.bobcatrobotics.GameSpecific.Rebuilt.HubUtil;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
-import choreo.auto.AutoChooser;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -135,7 +128,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("Idle", robotState.setStateIdle());
         NamedCommands.registerCommand("Shoot", robotState.setStateShoot());
         NamedCommands.registerCommand("Pass", robotState.setStatePass());
-        NamedCommands.registerCommand("SpinUp", robotState.setStateSpinUp());
+        NamedCommands.registerCommand("SpinUpShoot", robotState.setStateSpinUpShoot());
+        NamedCommands.registerCommand("SpinUpPass", robotState.setStateSpinUpPass());
         NamedCommands.registerCommand("Intake", robotState.setStateIntake());
         NamedCommands.registerCommand("Outtake", robotState.setStateOuttake());
         NamedCommands.registerCommand("Unjam", robotState.setStateUnjam());
@@ -198,15 +192,23 @@ public class RobotContainer {
                         drive).ignoringDisable(true));
 
         driverController.a()
-                .whileTrue(robotState.setStateSpinUp()
+                .whileTrue(robotState.setStateSpinUpShoot()
                         .until(() -> robotState
-                                .getShooterVelocity() >= shooterConstants.SHOOTING_TEST_SPEEDS
+                                .getShooterVelocity() >= robotState.getShootingInterpolatorVelocity()
                                         - 3)
                         .andThen(robotState.setStateShoot()))
-                .onFalse(robotState.setStateIdle());
+                .onFalse(robotState.setHoodDefault()
+                        .until(() -> robotState.getHoodPosition() >= -0.05)
+                        .andThen(robotState.setStateIdle()));
 
-        driverController.y().whileTrue(robotState.setStateShoot())
-                .onFalse(robotState.setStateIdle());
+        driverController.y().whileTrue(robotState.setStateSpinUpPass()
+                .until(() -> robotState
+                        .getShooterVelocity() >= robotState.getPassingInterpolatorVelocity()
+                                - 3)
+                .andThen(robotState.setStatePass()))
+                .onFalse(robotState.setHoodDefault()
+                        .until(() -> robotState.getHoodPosition() >= -0.05)
+                        .andThen(robotState.setStateIdle()));
 
         driverController.leftBumper()
                 .whileTrue(robotState.setStateIntake())
@@ -224,8 +226,9 @@ public class RobotContainer {
                 .whileTrue(robotState.setStateIntakeStored())
                 .onFalse(robotState.setStateIdle());
 
-        // driverController.b().onTrue(Commands.runOnce(()->
-        // intake.setCurrentState(IntakeStates.IntakeDeployed)));
+        driverController.back().onTrue(robotState.setHoodZero());
+
+        driverController.start().onTrue(robotState.setIntakeDeployZero());
     }
 
     /**

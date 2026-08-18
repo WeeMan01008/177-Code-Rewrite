@@ -99,6 +99,10 @@ public class IntakeState extends SubsystemBase {
         rightIntakeRoller.stopMotor();
     }
 
+    public void resetIntakeZeroPosition() {
+        intakeDeploy.setPosition(0);
+    }
+
     public StatusSignal<Angle> getIntakePosition() {
         return intakeDeploy.getPosition();
     }

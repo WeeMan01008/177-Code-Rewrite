@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.hoodConstants;
+import frc.robot.Constants.shooterConstants;
 import frc.robot.subsystems.carwash.CarwashState;
 import frc.robot.subsystems.carwash.CarwashState.CarwashStates;
 import frc.robot.subsystems.drive.Drive;
@@ -24,14 +25,14 @@ import org.bobcatrobotics.GameSpecific.Rebuilt.HubUtil;
 import org.bobcatrobotics.Util.Interpolators.*;
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.StatusSignal;
-
 public class RobotState extends SubsystemBase {
     private double distanceToHub = 0.0;
     private double distanceToPass = 0.0;
     public Translation2d passLocation = new Translation2d();
-    // private double passingVelocity = shooterConstants.SHOOTER_SPEEDS[0];
-    // private double shooterVelocity = shooterConstants.PASSING_SPEEDS[0];
+    private double passingVelocity = shooterConstants.SHOOTER_SPEEDS[0];
+    private double passingPosition = hoodConstants.HOOD_POSITION_PASSING[0];
+    private double shooterVelocity = shooterConstants.PASSING_SPEEDS[0];
+    private double shooterPosition = hoodConstants.HOOD_POSITION_SHOOTING[0];
 
     private IntakeState intakeState = new IntakeState();
     private ShooterState shooterState = new ShooterState();
@@ -48,19 +49,21 @@ public class RobotState extends SubsystemBase {
         passLocation = HubUtil.getMyPassingCoordinates(alliance, drive).toPose2d().getTranslation();
     }
 
-    // public DoubleOutputInterpolator shootingInterpolator = new
-    // DoubleOutputInterpolator(shooterConstants.SHOOTING_DISTANCES,
-    // shooterConstants.SHOOTER_SPEEDS, hoodConstants.HOOD_POSITION_SHOOTING,
-    // false);
-    // public DoubleOutputInterpolator passingInterpolator = new
-    // DoubleOutputInterpolator(shooterConstants.PASSING_DISTANCES,
-    // shooterConstants.PASSING_SPEEDS, hoodConstants.HOOD_POSITION_PASSING, false);
+    public DoubleOutputInterpolator shootingInterpolator = new DoubleOutputInterpolator(
+            shooterConstants.SHOOTING_DISTANCES,
+            shooterConstants.SHOOTER_SPEEDS, hoodConstants.HOOD_POSITION_SHOOTING,
+            false);
+
+    public DoubleOutputInterpolator passingInterpolator = new DoubleOutputInterpolator(
+            shooterConstants.PASSING_DISTANCES,
+            shooterConstants.PASSING_SPEEDS, hoodConstants.HOOD_POSITION_PASSING, false);
 
     public enum RobotStates {
         Idle,
         Shoot,
         Pass,
-        SpinUp,
+        SpinUpShoot,
+        SpinUpPass,
         Intake,
         Outtake,
         Unjam,
@@ -89,15 +92,58 @@ public class RobotState extends SubsystemBase {
 
     public void setDistanceToHub(double distance) {
         distanceToHub = distance;
-        // shooterVelocity = shootingInterpolator.getAsList(distanceToHub).get(0);
+        shooterVelocity = shootingInterpolator.getAsList(distanceToHub).get(0);
+        shooterPosition = shootingInterpolator.getAsList(distanceToHub).get(1);
     }
 
     public double getDistanceToHub() {
         return distanceToHub;
     }
 
+    public void setDistanceToPass(double distance) {
+        distanceToPass = distance;
+        passingVelocity = passingInterpolator.getAsList(distanceToPass).get(0);
+        passingPosition = passingInterpolator.getAsList(distanceToPass).get(1);
+    }
+
+    public double getDistanceToPass() {
+        return distanceToPass;
+    }
+
+    public double getShootingInterpolatorVelocity() {
+        return shooterVelocity;
+    }
+
+    public double getPassingInterpolatorVelocity() {
+        return passingVelocity;
+    }
+
+    public double getShootingInterpolatorPosition() {
+        return shooterPosition;
+    }
+
+    public double getPassingInterpolatorPosition() {
+        return passingPosition;
+    }
+
+    public double getHoodPosition() {
+        return hoodState.getHoodPosition().getValueAsDouble();
+    }
+
     public void setPassingLocation(Translation2d loc) {
         passLocation = loc;
+    }
+
+    public Command setIntakeDeployZero() {
+        return Commands.runOnce(() -> intakeState.resetIntakeZeroPosition());
+    }
+
+    public Command setHoodZero() {
+        return Commands.runOnce(() -> hoodState.resetHoodZeroPosition(), hoodState);
+    }
+
+    public Command setHoodDefault() {
+        return Commands.runOnce(() -> hoodState.setCurrentState(HoodStates.PositionDefault), hoodState);
     }
 
     public Command setStateIdle() {
@@ -115,8 +161,13 @@ public class RobotState extends SubsystemBase {
                 shooterState, intakeState, hotdogState, hoodState, carwashState);
     }
 
-    public Command setStateSpinUp() {
-        return Commands.runOnce(() -> setCurrentState(RobotStates.SpinUp),
+    public Command setStateSpinUpShoot() {
+        return Commands.runOnce(() -> setCurrentState(RobotStates.SpinUpShoot),
+                shooterState, intakeState, hotdogState, hoodState, carwashState);
+    }
+
+    public Command setStateSpinUpPass() {
+        return Commands.runOnce(() -> setCurrentState(RobotStates.SpinUpPass),
                 shooterState, intakeState, hotdogState, hoodState, carwashState);
     }
 
@@ -175,11 +226,20 @@ public class RobotState extends SubsystemBase {
 
                 break;
 
-            case SpinUp:
+            case SpinUpShoot:
                 shooterState.setCurrentState(ShooterStates.Shoot);
                 intakeState.setCurrentState(IntakeStates.Intake);
                 hotdogState.setCurrentState(HotdogStates.Reverse);
                 hoodState.setCurrentState(HoodStates.PositionShoot);
+                carwashState.setCurrentState(CarwashStates.Reverse);
+
+                break;
+
+            case SpinUpPass:
+                shooterState.setCurrentState(ShooterStates.Pass);
+                intakeState.setCurrentState(IntakeStates.Intake);
+                hotdogState.setCurrentState(HotdogStates.Reverse);
+                hoodState.setCurrentState(HoodStates.PositionPass);
                 carwashState.setCurrentState(CarwashStates.Reverse);
 
                 break;
@@ -240,11 +300,38 @@ public class RobotState extends SubsystemBase {
                     .getTranslation();
         }
 
+        setDistanceToHub(
+                Units.metersToInches(
+                        Math.sqrt(Math.pow(hubLocation.getX() - drive.getPose().getX(), 2) +
+                                Math.pow(hubLocation.getY() - drive.getPose().getY(), 2)))
+                        - shooterConstants.SHOOTING_OFFSET);
+
+        setDistanceToPass(
+                Units.metersToInches(
+                        Math.sqrt(Math.pow(passLocation.getX() - drive.getPose().getX(), 2)
+                                +
+                                Math.pow(passLocation.getY() - drive.getPose().getY(), 2)))
+                        - shooterConstants.SHOOTING_OFFSET);
+
         setPassingLocation(HubUtil
                 .getMyPassingCoordinates(alliance,
                         drive)
                 .toPose2d().getTranslation());
-        Logger.recordOutput("Hood_Position", hoodState.getHoodPosition().getValueAsDouble());
+
+        shooterState.setShooterVelocity(shooterVelocity);
+        shooterState.setPassingVelocity(passingVelocity);
+
+        hoodState.setShootingPosition(shooterPosition);
+        hoodState.setPassingPosition(passingPosition);
+
+        Logger.recordOutput("Distance_To_Hub", getDistanceToHub());
+        Logger.recordOutput("Distance_To_pass", getDistanceToPass());
+        Logger.recordOutput("Shooter_Interpolator_Velocity", getShootingInterpolatorVelocity());
+        Logger.recordOutput("Passing_Interpolator_Velocity", getPassingInterpolatorVelocity());
+        Logger.recordOutput("Hood_Position_Shoot", getShootingInterpolatorPosition());
+        Logger.recordOutput("Hood_Position_Pass", getPassingInterpolatorPosition());
+        Logger.recordOutput("Shooter_Velocity", getShooterVelocity());
+        Logger.recordOutput("Hood_Position", getHoodPosition());
     }
 
 }
