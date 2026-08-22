@@ -12,9 +12,13 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -102,6 +106,11 @@ public class Robot extends LoggedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
+        Logger.recordOutput("RobotPose", new Pose2d());
+        Logger.recordOutput("ZeroedComponentPoses", new Pose3d[] { new Pose3d() });
+        Logger.recordOutput("FinalComponentPoses", new Pose3d[] {
+                new Pose3d(-0.238, 0.0, 0.298, new Rotation3d(0.0, Math.sin(Timer.getTimestamp()) - 1.0, 0.0))
+        });
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

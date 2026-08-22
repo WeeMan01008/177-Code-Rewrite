@@ -35,8 +35,10 @@ public class CarwashState extends SubsystemBase {
     public void configureCarwash() {
         carwash = new TalonFX(carwashConstants.CARWASH_WASHER_MOTOR_ID, new CANBus("rio"));
         var carwashConfigure = new TalonFXConfiguration();
-        carwashConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
+        carwashConfigure.CurrentLimits.StatorCurrentLimit = carwashConstants.CARWASH_STATOR_LIMIT;
         carwashConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
+        carwashConfigure.CurrentLimits.SupplyCurrentLimit = carwashConstants.CARWASH_SUPPLY_LIMIT;
+        carwashConfigure.CurrentLimits.SupplyCurrentLimitEnable = true;
         carwashConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         carwashConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         carwashConfigure.Slot0.kS = 0.340;

@@ -37,9 +37,10 @@ public final class Constants {
         // Constant for hood motor ID
         public static final int HOOD_MOTOR_ID = 21;
 
-        public static final double[] HOOD_POSITION_SHOOTING = { 0, 0, -0.5, -0.75, -1.0, -1.4, -1.6, -1.8, -2.0, -2.2,
-                -2.4 };
-        public static final double[] HOOD_POSITION_PASSING = { -3.0, -3.5, -4.0, -4.5, -5.0, -5.5, -6.0 };
+        public static final double[] HOOD_POSITION_SHOOTING = { -0.25, -0.5, -0.75, -1, -1.5, -2, -2.2, -2.4, -2.6,
+                -3.3, -3.6, -3.8, -4.2, -4.5, -5.0, -5.3, -5.5 };
+        public static final double[] HOOD_POSITION_PASSING = { -3.2, -3.4, -3.6, -3.8, -4, -4.2, -4.4, -4.6, -4.8,
+                -5 };
 
         public static final double HOOD_TEST_POSITION = -5.5;
 
@@ -47,8 +48,8 @@ public final class Constants {
 
         public static final double HOOD_UP = -6.488;
 
-        public static final double statorCurrentLimit = 80;
-        public static final double supplyCurrentLimit = 80;
+        public static final double HOOD_STATOR_LIMIT = 60;
+        public static final double HOOD_SUPPLY_LIMIT = 40;
         public static final double forwardSoftwareLimit = -6.2;
         public static final double reverseSoftwareLimit = 0;
     }
@@ -61,16 +62,21 @@ public final class Constants {
         public static final int TOPRIGHT_SHOOTER_MOTOR_ID = 11;
         public static final int BOTTOMRIGHT_SHOOTER_MOTOR_ID = 14;
 
-        public static final int STATOR_CURRENT_LIMIT = 70;
+        public static final double SHOOTER_DEBOUNCE_TIME = 0.1;
+        public static final double SPINUP_VELOCITY_TOLERANCE = 4;
 
-        public static final double[] SHOOTING_DISTANCES = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+        public static final int STATOR_CURRENT_LIMIT = 80;
+        public static final int SUPPLY_CURRENT_LIMIT = 60;
 
-        public static final double[] SHOOTER_SPEEDS = { 33.5, 33.5, 33.5, 33.5, 34.5, 36.25, 36.25, 37.5, 38, 38.5,
-                39 };
+        public static final double[] SHOOTING_DISTANCES = { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130,
+                140, 150, 160 };
 
-        public static final double[] PASSING_DISTANCES = { 0, 30, 40, 50, 60, 70, 80 };
+        public static final double[] SHOOTER_SPEEDS = { 33.5, 33.5, 33.5, 33.5, 34.5, 36.25, 36.25, 37, 37.5, 38,
+                38.5, 39, 39.25, 40, 40.5, 41, 41 };
 
-        public static final double[] PASSING_SPEEDS = { 30, 31, 32, 33, 34, 35, 36 };
+        public static final double[] PASSING_DISTANCES = { 130, 140, 150, 160, 170, 180, 190, 200, 210, 220 };
+
+        public static final double[] PASSING_SPEEDS = { 31, 32, 33, 34, 35, 36, 38, 40, 41, 42 };
 
         public static final double SHOOTING_TEST_SPEEDS = 35;
         public static final double UNJAM_VELOCITY = 30;
@@ -88,7 +94,11 @@ public final class Constants {
         public static final int INTAKE_ROLLERLEFT_MOTOR_ID = 18;
         public static final int INTAKE_ROLLERRIGHT_MOTOR_ID = 19;
 
-        public static final int STATOR_CURRENT_LIMIT = 70;
+        public static final int INTAKE_STATOR_LIMIT = 40;
+        public static final int INTAKE_SUPPLY_LIMIT = 40;
+
+        public static final int INTAKE_DEPLOY_STATOR_LIMIT = 80;
+        public static final int INTAKE_DEPLOY_SUPPLY_LIMIT = 80;
 
         public static final double INTAKE_VELOCITY = 70;
         public static final double OUTTAKE_VELOCITY = 70;
@@ -105,6 +115,8 @@ public final class Constants {
         public static final double INTAKE_VELOCITY = 30;
         public static final double OUTTAKE_VELOCITY = 60;
 
+        public static final double HOTDOG_STATOR_LIMIT = 40;
+        public static final double HOTDOG_SUPPLY_LIMIT = 40;
     }
 
     public static class carwashConstants {
@@ -112,7 +124,10 @@ public final class Constants {
         public static final int CARWASH_WASHER_MOTOR_ID = 15;
 
         public static final double CARWASH_SPIN_VELOCITY = 35;
-        public static final double CARWASH_SPIN_REVERSE_VELOCITY = 25;
+        public static final double CARWASH_SPIN_REVERSE_VELOCITY = 30;
         public static final double CARWASH_OUTTAKE_VELOCITY = 35;
+
+        public static final double CARWASH_STATOR_LIMIT = 80;
+        public static final double CARWASH_SUPPLY_LIMIT = 60;
     }
 }

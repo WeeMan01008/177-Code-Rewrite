@@ -135,6 +135,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Unjam", robotState.setStateUnjam());
         NamedCommands.registerCommand("Intake Stored", robotState.setStateIntakeStored());
         NamedCommands.registerCommand("Intake Deployed", robotState.setStateIntakeDeploy());
+        NamedCommands.registerCommand("Hood Default", robotState.setHoodDefault());
     }
 
     /**
@@ -192,23 +193,12 @@ public class RobotContainer {
                         drive).ignoringDisable(true));
 
         driverController.a()
-                .whileTrue(robotState.setStateSpinUpShoot()
-                        .until(() -> robotState
-                                .getShooterVelocity() >= robotState.getShootingInterpolatorVelocity()
-                                        - 3)
-                        .andThen(robotState.setStateShoot()))
-                .onFalse(robotState.setHoodDefault()
-                        .until(() -> robotState.getHoodPosition() >= -0.05)
-                        .andThen(robotState.setStateIdle()));
+                .whileTrue(robotState.setStateSpinUpShoot())
+                .onFalse(robotState.setHoodDefault());
 
-        driverController.y().whileTrue(robotState.setStateSpinUpPass()
-                .until(() -> robotState
-                        .getShooterVelocity() >= robotState.getPassingInterpolatorVelocity()
-                                - 3)
-                .andThen(robotState.setStatePass()))
-                .onFalse(robotState.setHoodDefault()
-                        .until(() -> robotState.getHoodPosition() >= -0.05)
-                        .andThen(robotState.setStateIdle()));
+        driverController.y()
+                .whileTrue(robotState.setStateSpinUpPass())
+                .onFalse(robotState.setHoodDefault());
 
         driverController.leftBumper()
                 .whileTrue(robotState.setStateIntake())

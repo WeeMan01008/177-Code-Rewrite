@@ -10,6 +10,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.shooterConstants;
@@ -20,9 +22,11 @@ public class ShooterState extends SubsystemBase {
     private TalonFX topLeftShooter;
     private TalonFX bottomRightShooter;
     private TalonFX bottomLeftShooter;
+    private final Debouncer shootDebouncer;
 
     public ShooterState() {
         configureTopRightShooter();
+        shootDebouncer = new Debouncer(shooterConstants.SHOOTER_DEBOUNCE_TIME, DebounceType.kBoth);
     }
 
     private final VelocityVoltage shooterMotorPIDRequest = new VelocityVoltage(0).withSlot(0).withEnableFOC(false);
@@ -46,13 +50,15 @@ public class ShooterState extends SubsystemBase {
         var shooterConfigure = new TalonFXConfiguration();
         shooterConfigure.CurrentLimits.StatorCurrentLimit = shooterConstants.STATOR_CURRENT_LIMIT;
         shooterConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
+        shooterConfigure.CurrentLimits.SupplyCurrentLimit = shooterConstants.SUPPLY_CURRENT_LIMIT;
+        shooterConfigure.CurrentLimits.SupplyCurrentLimitEnable = true;
         shooterConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         shooterConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        shooterConfigure.Slot0.kS = 0.273;
-        shooterConfigure.Slot0.kV = 0.120;
-        shooterConfigure.Slot0.kP = 1.664;
+        shooterConfigure.Slot0.kS = 0.303;
+        shooterConfigure.Slot0.kV = 0.25;
+        shooterConfigure.Slot0.kP = 4.7;
         shooterConfigure.Slot0.kI = 0;
-        shooterConfigure.Slot0.kD = -0.002;
+        shooterConfigure.Slot0.kD = 0;
         topRightShooter.getConfigurator().apply(shooterConfigure);
 
         bottomRightShooter
@@ -97,6 +103,20 @@ public class ShooterState extends SubsystemBase {
 
     public StatusSignal<AngularVelocity> getBottomLeftShooterVelocity() {
         return bottomLeftShooter.getVelocity();
+    }
+
+    public boolean atShootingVelocity() {
+        return shootDebouncer.calculate(Math.abs(
+                shootingVelocity
+                        - topRightShooter.getVelocity()
+                                .getValueAsDouble()) < shooterConstants.SPINUP_VELOCITY_TOLERANCE);
+    }
+
+    public boolean atPassingVelocity() {
+        return shootDebouncer.calculate(Math.abs(
+                passingVelocity
+                        - topRightShooter.getVelocity()
+                                .getValueAsDouble()) < shooterConstants.SPINUP_VELOCITY_TOLERANCE);
     }
 
     public void setCurrentState(ShooterStates state) {

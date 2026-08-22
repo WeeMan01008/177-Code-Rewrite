@@ -36,8 +36,10 @@ public class HotdogState extends SubsystemBase {
     public void configureHotdog() {
         hotdog = new TalonFX(hotdogConstants.HOTDOG_MOTOR_ID, new CANBus("rio"));
         var hotdogConfigure = new TalonFXConfiguration();
-        hotdogConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
+        hotdogConfigure.CurrentLimits.StatorCurrentLimit = hotdogConstants.HOTDOG_STATOR_LIMIT;
         hotdogConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
+        hotdogConfigure.CurrentLimits.SupplyCurrentLimit = hotdogConstants.HOTDOG_SUPPLY_LIMIT;
+        hotdogConfigure.CurrentLimits.SupplyCurrentLimitEnable = true;
         hotdogConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         hotdogConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         hotdogConfigure.Slot0.kS = 0.359;

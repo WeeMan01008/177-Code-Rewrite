@@ -35,9 +35,9 @@ public class HoodState extends SubsystemBase {
     public void configureHood() {
         var hoodConfigure = new TalonFXConfiguration();
         hood = new TalonFX(hoodConstants.HOOD_MOTOR_ID, new CANBus("rio"));
-        hoodConfigure.CurrentLimits.StatorCurrentLimit = hoodConstants.statorCurrentLimit;
+        hoodConfigure.CurrentLimits.StatorCurrentLimit = hoodConstants.HOOD_STATOR_LIMIT;
         hoodConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
-        hoodConfigure.CurrentLimits.SupplyCurrentLimit = hoodConstants.supplyCurrentLimit;
+        hoodConfigure.CurrentLimits.SupplyCurrentLimit = hoodConstants.HOOD_SUPPLY_LIMIT;
         hoodConfigure.CurrentLimits.SupplyCurrentLimitEnable = true;
         hoodConfigure.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         hoodConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;

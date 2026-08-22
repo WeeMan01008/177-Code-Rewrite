@@ -60,6 +60,7 @@ public class RobotState extends SubsystemBase {
 
     public enum RobotStates {
         Idle,
+        HoodDefault,
         Shoot,
         Pass,
         SpinUpShoot,
@@ -72,6 +73,14 @@ public class RobotState extends SubsystemBase {
     }
 
     private RobotStates CurrentState = RobotStates.Idle;
+
+    public boolean atShootingVelocity() {
+        return shooterState.atShootingVelocity();
+    }
+
+    public boolean atPassingVelocity() {
+        return shooterState.atPassingVelocity();
+    }
 
     public void setAlliance(Alliance alliance) {
         this.alliance = alliance;
@@ -143,7 +152,8 @@ public class RobotState extends SubsystemBase {
     }
 
     public Command setHoodDefault() {
-        return Commands.runOnce(() -> hoodState.setCurrentState(HoodStates.PositionDefault), hoodState);
+        return Commands.runOnce(() -> setCurrentState(RobotStates.HoodDefault),
+                shooterState, intakeState, hotdogState, hoodState, carwashState);
     }
 
     public Command setStateIdle() {
@@ -208,6 +218,19 @@ public class RobotState extends SubsystemBase {
 
                 break;
 
+            case HoodDefault:
+                if (hoodState.getHoodPosition().getValueAsDouble() >= -0.05) {
+                    setCurrentState(RobotStates.Idle);
+                } else {
+                    shooterState.setCurrentState(ShooterStates.Idle);
+                    intakeState.setCurrentState(IntakeStates.Idle);
+                    hotdogState.setCurrentState(HotdogStates.Idle);
+                    hoodState.setCurrentState(HoodStates.PositionDefault);
+                    carwashState.setCurrentState(CarwashStates.Idle);
+                }
+
+                break;
+
             case Shoot:
                 shooterState.setCurrentState(ShooterStates.Shoot);
                 intakeState.setCurrentState(IntakeStates.Intake);
@@ -227,20 +250,28 @@ public class RobotState extends SubsystemBase {
                 break;
 
             case SpinUpShoot:
-                shooterState.setCurrentState(ShooterStates.Shoot);
-                intakeState.setCurrentState(IntakeStates.Intake);
-                hotdogState.setCurrentState(HotdogStates.Reverse);
-                hoodState.setCurrentState(HoodStates.PositionShoot);
-                carwashState.setCurrentState(CarwashStates.Reverse);
+                if (shooterState.atShootingVelocity()) {
+                    setCurrentState(RobotStates.Shoot);
+                } else {
+                    shooterState.setCurrentState(ShooterStates.Shoot);
+                    intakeState.setCurrentState(IntakeStates.Intake);
+                    hotdogState.setCurrentState(HotdogStates.Reverse);
+                    hoodState.setCurrentState(HoodStates.PositionShoot);
+                    carwashState.setCurrentState(CarwashStates.Reverse);
+                }
 
                 break;
 
             case SpinUpPass:
-                shooterState.setCurrentState(ShooterStates.Pass);
-                intakeState.setCurrentState(IntakeStates.Intake);
-                hotdogState.setCurrentState(HotdogStates.Reverse);
-                hoodState.setCurrentState(HoodStates.PositionPass);
-                carwashState.setCurrentState(CarwashStates.Reverse);
+                if (shooterState.atPassingVelocity()) {
+                    setCurrentState(RobotStates.Pass);
+                } else {
+                    shooterState.setCurrentState(ShooterStates.Pass);
+                    intakeState.setCurrentState(IntakeStates.Intake);
+                    hotdogState.setCurrentState(HotdogStates.Reverse);
+                    hoodState.setCurrentState(HoodStates.PositionPass);
+                    carwashState.setCurrentState(CarwashStates.Reverse);
+                }
 
                 break;
 

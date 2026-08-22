@@ -44,8 +44,10 @@ public class IntakeState extends SubsystemBase {
     public void configureIntakeDeploy() {
         intakeDeploy = new TalonFX(intakeConstants.INTAKE_DEPLOY_MOTOR_ID, new CANBus("rio"));
         var intakeDeployConfigure = new TalonFXConfiguration();
-        intakeDeployConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
+        intakeDeployConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.INTAKE_DEPLOY_STATOR_LIMIT;
         intakeDeployConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
+        intakeDeployConfigure.CurrentLimits.SupplyCurrentLimit = intakeConstants.INTAKE_DEPLOY_SUPPLY_LIMIT;
+        intakeDeployConfigure.CurrentLimits.SupplyCurrentLimitEnable = true;
         intakeDeployConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         intakeDeployConfigure.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         intakeDeployConfigure.Slot0.kS = 0;
@@ -60,8 +62,10 @@ public class IntakeState extends SubsystemBase {
         rightIntakeRoller = new TalonFX(intakeConstants.INTAKE_ROLLERRIGHT_MOTOR_ID, new CANBus("rio"));
         leftIntakeRoller = new TalonFX(intakeConstants.INTAKE_ROLLERLEFT_MOTOR_ID, new CANBus("rio"));
         var intakeRollersConfigure = new TalonFXConfiguration();
-        intakeRollersConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.STATOR_CURRENT_LIMIT;
+        intakeRollersConfigure.CurrentLimits.StatorCurrentLimit = intakeConstants.INTAKE_STATOR_LIMIT;
         intakeRollersConfigure.CurrentLimits.StatorCurrentLimitEnable = true;
+        intakeRollersConfigure.CurrentLimits.SupplyCurrentLimit = intakeConstants.INTAKE_SUPPLY_LIMIT;
+        intakeRollersConfigure.CurrentLimits.SupplyCurrentLimitEnable = true;
         intakeRollersConfigure.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         intakeRollersConfigure.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         intakeRollersConfigure.Slot0.kS = 0.241;
