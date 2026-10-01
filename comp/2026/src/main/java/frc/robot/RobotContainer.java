@@ -26,6 +26,7 @@ import org.bobcatrobotics.GameSpecific.Rebuilt.HubUtil;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -33,6 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.lib.BLine.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -49,10 +51,13 @@ public class RobotContainer {
     public final Vision vision;
     public final Drive drive;
     private final SendableChooser<Command> autoChooser;
+    private final SendableChooser<Path> blineAutos;
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController driverController = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
+
+    private final FollowPath.Builder pathBuilder;
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -109,22 +114,37 @@ public class RobotContainer {
                 break;
         }
 
+        pathBuilder = new FollowPath.Builder(
+                drive,
+                drive::getPose,
+                drive::getChassisSpeeds,
+                drive::runVelocity,
+                new PIDController(2, 0, 0),
+                new PIDController(1, 0, 0),
+                new PIDController(0.2, 0, 0)).withDefaultShouldFlip()
+                .withTRatioBasedTranslationHandoffs(true);
+
         robotState = new RobotState(drive);
 
         registerNammedCommands();
 
         autoChooser = new SendableChooser<>();
+        blineAutos = new SendableChooser<>();
 
         autoChooser.setDefaultOption("Do Nothing", new PathPlannerAuto("Do Nothing"));
         autoChooser.addOption("Mid Sweep", new PathPlannerAuto("Single Mid Sweep"));
+        blineAutos.setDefaultOption("Test_BLine", new Path("Test_Path"));
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
+        SmartDashboard.putData("BLine Chooser", blineAutos);
 
         // Configure the trigger bindings
         configureBindings();
     }
 
     private void registerNammedCommands() {
+        new Path.EventTrigger(0, null);
+
         NamedCommands.registerCommand("Idle", robotState.setStateIdle());
         NamedCommands.registerCommand("Shoot", robotState.setStateShoot());
         NamedCommands.registerCommand("Pass", robotState.setStatePass());
@@ -228,7 +248,8 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An example command will be run in autonomous
-        return autoChooser.getSelected();
+        Path testPath = new Path("Test_Path");
+        return blineAutos;
     }
 
     public Pose2d getPose2D() {
