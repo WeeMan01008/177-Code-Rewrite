@@ -32,6 +32,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.lib.BLine.*;
@@ -249,8 +250,12 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         // An example command will be run in autonomous
         Path testPath = new Path("Test_Path");
-        return blineAutos;
+        return MergedAuto;
     }
+
+    Command MergedAuto = Commands.sequence(
+        new PathPlannerAuto("Single Mid Sweep"), 
+        pathBuilder.build(new Path("Test_Path")));
 
     public Pose2d getPose2D() {
         return drive.getPose();
