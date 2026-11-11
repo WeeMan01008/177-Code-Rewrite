@@ -51,7 +51,7 @@ public class RobotContainer {
     public final Vision vision;
     public final Drive drive;
     private final SendableChooser<Command> autoChooser;
-    private final SendableChooser<Path> blineAutos;
+    private final SendableChooser<Command> blineAutos;
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController driverController = new CommandXboxController(0);
@@ -131,9 +131,12 @@ public class RobotContainer {
         autoChooser = new SendableChooser<>();
         blineAutos = new SendableChooser<>();
 
+        Path testPath = new Path("Test_Path");
+
         autoChooser.setDefaultOption("Do Nothing", new PathPlannerAuto("Do Nothing"));
         autoChooser.addOption("Mid Sweep", new PathPlannerAuto("Single Mid Sweep"));
-        blineAutos.setDefaultOption("Test_BLine", new Path("Test_Path"));
+
+        blineAutos.setDefaultOption("Test_BLine", pathBuilder.withPoseReset(drive::setPose).build(testPath));
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         SmartDashboard.putData("BLine Chooser", blineAutos);
@@ -143,7 +146,17 @@ public class RobotContainer {
     }
 
     private void registerNammedCommands() {
-        new Path.EventTrigger(0, null);
+        FollowPath.registerEventTrigger("Idle", robotState.setStateIdle());
+        FollowPath.registerEventTrigger("Shoot", robotState.setStateShoot());
+        FollowPath.registerEventTrigger("Pass", robotState.setStatePass());
+        FollowPath.registerEventTrigger("SpinUpShoot", robotState.setStateSpinUpShoot());
+        FollowPath.registerEventTrigger("SpinUpPass", robotState.setStateSpinUpPass());
+        FollowPath.registerEventTrigger("Intake", robotState.setStateIntake());
+        FollowPath.registerEventTrigger("Outtake", robotState.setStateOuttake());
+        FollowPath.registerEventTrigger("Unjam", robotState.setStateUnjam());
+        FollowPath.registerEventTrigger("Intake Stored", robotState.setStateIntakeStored());
+        FollowPath.registerEventTrigger("Intake Deployed", robotState.setStateIntakeDeploy());
+        FollowPath.registerEventTrigger("Hood Default", robotState.setHoodDefault());
 
         NamedCommands.registerCommand("Idle", robotState.setStateIdle());
         NamedCommands.registerCommand("Shoot", robotState.setStateShoot());
@@ -248,8 +261,7 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An example command will be run in autonomous
-        Path testPath = new Path("Test_Path");
-        return blineAutos;
+        return blineAutos.getSelected();
     }
 
     public Pose2d getPose2D() {

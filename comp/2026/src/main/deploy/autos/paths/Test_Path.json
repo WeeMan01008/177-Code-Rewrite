@@ -22,12 +22,17 @@
       "type": "translation",
       "x_meters": 7.88,
       "y_meters": 7.35,
-      "intermediate_handoff_radius_meters": 0.7
+      "intermediate_handoff_radius_meters": 0.5
+    },
+    {
+      "type": "event_trigger",
+      "t_ratio": 0.0,
+      "lib_key": "Intake"
     },
     {
       "type": "rotation",
       "rotation_radians": 1.5708,
-      "t_ratio": 0.5,
+      "t_ratio": 0.1,
       "profiled_rotation": true
     },
     {
@@ -46,6 +51,11 @@
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
+        "value": 2.0,
+        "start_ordinal": 2,
+        "end_ordinal": 2
+      },
+      {
         "value": 1.0,
         "start_ordinal": 0,
         "end_ordinal": 0
@@ -54,11 +64,6 @@
         "value": 1.0,
         "start_ordinal": 1,
         "end_ordinal": 1
-      },
-      {
-        "value": 3.0,
-        "start_ordinal": 2,
-        "end_ordinal": 2
       }
     ],
     "max_acceleration_meters_per_sec2": [
