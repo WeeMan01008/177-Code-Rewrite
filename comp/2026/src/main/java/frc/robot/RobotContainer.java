@@ -51,8 +51,8 @@ public class RobotContainer {
     private final RobotState robotState;
     public final Vision vision;
     public final Drive drive;
-    private final SendableChooser<Command> autoChooser;
-    private final SendableChooser<Path> blineAutos;
+    private final SendableChooser<Command> autoChooser; //This chooses between B line or pathplanner
+    //private final SendableChooser<Path> blineAutos; //This can be removed 
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController driverController = new CommandXboxController(0);
@@ -63,8 +63,12 @@ public class RobotContainer {
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
-    public RobotContainer() {
+    private final Path sweep1 = new Path("Trench to Center");
+    private final Path sweep2 = new Path("Center Sweep");
+    private final Path sweep3 = new Path("End of Center Sweep");
+    private final Path sweep4 = new Path("Over Left Bump");
 
+    public RobotContainer() {
         switch (Constants.currentMode) {
 
             case REAL:
@@ -114,7 +118,6 @@ public class RobotContainer {
                         new VisionIOLimelight(cameraConstants[3].name, drive::getRotation));
                 break;
         }
-
         pathBuilder = new FollowPath.Builder(
                 drive,
                 drive::getPose,
@@ -125,19 +128,36 @@ public class RobotContainer {
                 new PIDController(0.2, 0, 0)).withDefaultShouldFlip()
                 .withTRatioBasedTranslationHandoffs(true);
 
+        Command bline1 = pathBuilder.build(sweep1);
+        Command bline2 = pathBuilder.build(sweep2);
+        Command bline3 = pathBuilder.build(sweep3);
+        Command bline4 = pathBuilder.build(sweep4);
+
         robotState = new RobotState(drive);
+        Command blineSweep = Commands.sequence(
+                robotState.setStateIntakeDeploy(),
+                Commands.waitSeconds(0.1),
+                bline1,
+                robotState.setStateIntake(),
+                bline2,
+                bline3,
+                robotState.setStateIdle(),
+                bline4
+        );
 
         registerNammedCommands();
 
         autoChooser = new SendableChooser<>();
-        blineAutos = new SendableChooser<>();
+        //blineAutos = new SendableChooser<>();
 
         autoChooser.setDefaultOption("Do Nothing", new PathPlannerAuto("Do Nothing"));
-        autoChooser.addOption("Mid Sweep", new PathPlannerAuto("Single Mid Sweep"));
-        blineAutos.setDefaultOption("Test_BLine", new Path("Test_Path"));
+        autoChooser.addOption("Pathplanner Mid Sweep", new PathPlannerAuto("Single Mid Sweep"));
+        autoChooser.addOption("Bline Mid Sweep", blineSweep);
+
+        //blineAutos.setDefaultOption("Test_BLine", new Path("Test_Path"));
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
-        SmartDashboard.putData("BLine Chooser", blineAutos);
+        //SmartDashboard.putData("BLine Chooser", blineAutos);
 
         // Configure the trigger bindings
         configureBindings();
@@ -248,14 +268,13 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // An example command will be run in autonomous
-        Path testPath = new Path("Test_Path");
-        return MergedAuto;
+        //runs the selected auto on autochooser
+        return autoChooser.getSelected();
     }
-
-    Command MergedAuto = Commands.sequence(
+/*Command MergedAuto = Commands.sequence(
         new PathPlannerAuto("Single Mid Sweep"), 
-        pathBuilder.build(new Path("Test_Path")));
+        pathBuilder.build(new Path("Test_Path"))); */
+    
 
     public Pose2d getPose2D() {
         return drive.getPose();
