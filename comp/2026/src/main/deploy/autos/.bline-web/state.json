@@ -30,6 +30,10 @@
   "path_groups": [],
   "linked_targets": [],
   "paths": {
+    "left-bump2.json": {
+      "display_name": "Left_Bump2",
+      "editor_metadata": null
+    },
     "Test_Path.json": {
       "display_name": "Test_Path",
       "editor_metadata": null
@@ -40,10 +44,6 @@
     },
     "forward.json": {
       "display_name": "FORWARD",
-      "editor_metadata": null
-    },
-    "left-bump2.json": {
-      "display_name": "Left_Bump2",
       "editor_metadata": null
     }
   },
