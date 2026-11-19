@@ -65,7 +65,7 @@ public class RobotContainer {
      */
     private final Path sweep1 = new Path("Trench to Center");
     private final Path sweep2 = new Path("Center Sweep");
-    private final Path sweep3 = new Path("End of Center Sweep");
+    private final Path sweep3 = new Path("End of Center Sweep Left");
     private final Path sweep4 = new Path("Over Left Bump");
 
     public RobotContainer() {
