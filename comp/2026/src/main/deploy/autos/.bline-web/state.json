@@ -3,8 +3,8 @@
   "editor_config": {
     "gui": {
       "robot": {
-        "length_meters": 0.8,
-        "width_meters": 0.8
+        "length_meters": 1.17,
+        "width_meters": 0.83
       },
       "protrusions": {
         "enabled": false,
@@ -25,17 +25,21 @@
       "default_auto_velocity_merge_tolerance_meters_per_sec": 0.3
     }
   },
-  "active_path_file_name": "left-bump2.json",
+  "active_path_file_name": "forward.json",
   "active_path_group_id": null,
   "path_groups": [],
   "linked_targets": [],
   "paths": {
+    "Test_Path.json": {
+      "display_name": "Test_Path",
+      "editor_metadata": null
+    },
     "left-bump.json": {
       "display_name": "Left_Bump",
       "editor_metadata": null
     },
-    "Test_Path.json": {
-      "display_name": "Test_Path",
+    "forward.json": {
+      "display_name": "FORWARD",
       "editor_metadata": null
     },
     "left-bump2.json": {

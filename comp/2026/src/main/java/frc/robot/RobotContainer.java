@@ -132,11 +132,13 @@ public class RobotContainer {
         blineAutos = new SendableChooser<>();
 
         Path testPath = new Path("Test_Path");
+        Path FORWARD = new Path("forward");
 
         autoChooser.setDefaultOption("Do Nothing", new PathPlannerAuto("Do Nothing"));
         autoChooser.addOption("Mid Sweep", new PathPlannerAuto("Single Mid Sweep"));
 
         blineAutos.setDefaultOption("Test_BLine", pathBuilder.withPoseReset(drive::setPose).build(testPath));
+        blineAutos.setDefaultOption("forward", pathBuilder.withPoseReset(drive::setPose).build(FORWARD));
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         SmartDashboard.putData("BLine Chooser", blineAutos);
