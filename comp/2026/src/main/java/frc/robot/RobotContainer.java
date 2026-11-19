@@ -128,10 +128,10 @@ public class RobotContainer {
                 new PIDController(0.2, 0, 0)).withDefaultShouldFlip()
                 .withTRatioBasedTranslationHandoffs(true);
 
-        Command bline1 = pathBuilder.build(sweep1);
-        Command bline2 = pathBuilder.build(sweep2);
-        Command bline3 = pathBuilder.build(sweep3);
-        Command bline4 = pathBuilder.build(sweep4);
+        Command bline1 = pathBuilder.withPoseReset(drive::setPose).build(sweep1);
+        Command bline2 = pathBuilder.withPoseReset(drive::setPose).build(sweep2);
+        Command bline3 = pathBuilder.withPoseReset(drive::setPose).build(sweep3);
+        Command bline4 = pathBuilder.withPoseReset(drive::setPose).build(sweep4);
 
         robotState = new RobotState(drive);
         Command blineSweep = Commands.sequence(
